@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import pickle
+import wandb
 import math
 import torch.nn as nn
 import pandas as pd
@@ -84,11 +85,19 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
         timestring = get_now_string()
         train_loss_record.append(train_loss)
         valid_loss_record.append(valid_loss)
-        print("[{}] Epoch: {}/{}  train Loss: {:.9f}  val Loss: {:.9f}  min val Loss: {:.9f}  lr: {:.9f}".format(timestring, epoch, epochs, train_loss, valid_loss, min_val_loss, optimizer.param_groups[0]["lr"]))
+        try:
+            wandb.log({'epoch': epoch, 'val_loss': valid_loss, 'train_loss': train_loss, 'lr': optimizer.param_groups[0]["lr"]})
+        except:
+            pass
         scheduler.step()
+        if epoch % 100 == 0:
+            print("[{}] Epoch: {}/{}  train Loss: {:.9f}  val Loss: {:.9f}  min val Loss: {:.9f}  lr: {:.9f}".format(timestring, epoch, epochs, train_loss, valid_loss, min_val_loss, optimizer.param_groups[0]["lr"]))
+
         if epoch % 500 == 0:
             torch.save(model.state_dict(), main_path + "saves/model_{}.pt".format(timestring))
             # print("model saved to {}".format(main_path + "saves/model_{}.pt".format(timestring)))
+
+        scheduler.step()
         # if (epoch + 1) % 10 == 0:
         #     plt.figure(figsize=(16, 9))
         #     plt.plot(range(1, len(train_loss_record) + 1), train_loss_record, label="train loss")
@@ -126,7 +135,12 @@ if __name__ == "__main__":
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
     epochs = 5000
 
-    run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs, device, main_path)
+    wandb_flag = True
+    if wandb_flag:
+        with wandb.init(project='Simple_MLP', name='test'):
+            run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs, device, main_path)
+    else:
+         run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs, device, main_path)
 
 
 
