@@ -19,7 +19,7 @@ class MyDataset(Dataset):
         x_df = pd.read_csv(x_path)
         y_df = pd.read_csv(y_path)
         self.x_dim = 6
-        self.y_dim = 5
+        self.y_dim = 1
         self.x_data = torch.tensor(x_df.values, dtype=torch.float32)[:, :self.x_dim]
         self.y_data = torch.tensor(y_df.values, dtype=torch.float32)[:, :self.y_dim]
         print(f"Full x shape: {self.x_data.shape}")
