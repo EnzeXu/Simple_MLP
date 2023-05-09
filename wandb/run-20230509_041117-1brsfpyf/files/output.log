@@ -1,0 +1,3 @@
+
+Epoch:100/10000  train loss:3.1365e+00  val loss:2.2599e+00  best epoch:97  min loss:2.5996e-01  lr:9.055243606e-02  time:20.51s  time total:0.34min  time remain:33.84min
+Epoch:200/10000  train loss:4.3857e+00  val loss:5.8870e+00  best epoch:97  min loss:2.5996e-01  lr:6.563456467e-02  time:13.66s  time total:0.57min  time remain:27.90min

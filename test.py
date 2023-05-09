@@ -5,9 +5,10 @@ from torch.utils.data import Dataset, DataLoader
 
 from model import MyModel
 from utils import get_now_string
+from dataset import MyDataset
 
 
-def one_time_generate_res(pt_path):
+def one_time_generate_res(pt_path, timestring=None):
     main_path = "./"
     with open(main_path + "processed/all.pkl", "rb") as f:
         dataset = pickle.load(f)
@@ -29,10 +30,12 @@ def one_time_generate_res(pt_path):
     save_output_folder = "./record/output/"
     if not os.path.exists(save_output_folder):
         os.makedirs(save_output_folder)
-    save_output_path = f"{save_output_folder}/output_{get_now_string()}.txt"
+    if not timestring:
+        timestring = get_now_string()
+    save_output_path = f"{save_output_folder}/output_{timestring}.txt"
 
     with open(save_output_path, "a") as f:
-        f.write("val_id,x1,x2,x3,x4,x5,x6,y1,y2,y3,y4,y5,y6,y_pred_1,y_pred_2,y_pred_2,y_pred_2,y_pred_2,y_pred_2\n")
+        f.write("val_id,x1,x2,x3,x4,x5,x6,y1,y2,y3,y4,y5,y6,y_pred_1,y_pred_2,y_pred_3,y_pred_4,y_pred_5,y_pred_6\n")
         row_id = 0
         with torch.no_grad():
             for inputs, labels in val_loader:
@@ -52,4 +55,4 @@ def one_time_generate_res(pt_path):
 
 
 if __name__ == "__main__":
-    one_time_generate_res("")
+    one_time_generate_res("saves/model_20230509_052152_722761.pt")
