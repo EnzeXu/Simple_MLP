@@ -87,6 +87,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
     record_t0 = time.time()
     record_time_epoch_step = record_t0
     init_lr = optimizer.param_groups[0]["lr"]
+    print("start training: epochs = {}".format(epochs))
 
     for epoch in range(1, epochs + 1):
         train_loss = train(model, train_loader, criterion, optimizer, device)
