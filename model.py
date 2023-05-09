@@ -160,9 +160,21 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                 outputs = outputs.cpu().detach().numpy()
                 for i in range(len(inputs)):
                     row_id += 1
-                    f.write(f"[Truth   {row_id:05d}] {str(labels[i])}\n")
-                    f.write(f"[Predict {row_id:05d}] {str(outputs[i])}\n")
+                    f.write("[Truth   {0:05d}] {1}\n".format(
+                        row_id,
+                        " ".join([str("{0:.6e}".format(item)) for item in labels[i]]),
+                    ))
+                    f.write("[Predict {0:05d}] {1}\n".format(
+                        row_id,
+                        " ".join([str("{0:.6e}".format(item)) for item in outputs[i]]),
+                    ))
 
+def relative_loss(prediction, target):
+    criterion = nn.MSELoss(reduction="none")
+    mse_non_reduce = criterion(prediction, target)
+    errors = mse_non_reduce / (torch.pow(target, 2) + 1e-4)
+    errors = torch.mean(errors)
+    return errors
 
 if __name__ == "__main__":
     main_path = "./"
@@ -187,11 +199,11 @@ if __name__ == "__main__":
 
     model = MyModel(x_dim=dataset.x_dim, y_dim=dataset.y_dim).to(device)
     # model.load_state_dict(torch.load(main_path + "saves/model_20230228_211049_069082.pt"))
-    criterion = nn.MSELoss()
+    criterion = relative_loss  # nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.1)
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=1000, eta_min=0.001 * 0.1)
-    epochs = 10000
+    epochs = 100
 
     wandb_flag = True
     if wandb_flag:
@@ -199,6 +211,13 @@ if __name__ == "__main__":
             run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs, device, main_path)
     else:
          run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs, device, main_path)
+
+    # input = torch.tensor([1.01, 202.0])
+    # target = torch.tensor([1.0, 200.0])
+    # output = relative_loss(input, target)
+    # print(output)
+
+
 
 
 
