@@ -21,7 +21,7 @@ class MyDataset(Dataset):
 
         self.x_dim = 6
         self.y_dim = 6
-        self.x_data = torch.tensor(x_df.values, dtype=torch.float32)[:, :self.x_dim]
+        self.x_data = torch.tensor(x_df.values, dtype=torch.float32)[:, [1, 3, 5, 7, 9, 11]]
         self.y_data = torch.tensor(y_df.values, dtype=torch.float32)[:, :self.y_dim]
         print(f"Full x shape: {self.x_data.shape}")
         print(f"Full y shape: {self.y_data.shape}")
