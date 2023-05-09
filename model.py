@@ -1,3 +1,5 @@
+import os.path
+
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
@@ -78,7 +80,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
     valid_loss_record = []
     min_val_loss = float('Inf')
     best_epoch = 0
-    # record_timestring_start = get_now_string()
+    record_timestring_start = get_now_string()
     record_t0 = time.time()
     record_time_epoch_step = record_t0
 
@@ -118,6 +120,22 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
         #     plt.legend()
         #     plt.show()
         #     plt.close()
+    save_comparison_folder = "record/comparison/"
+    if not os.path.exists(save_comparison_folder):
+        os.makedirs(save_comparison_folder)
+    save_comparison_path = f"{save_comparison_folder}/val_{record_timestring_start}.txt"
+    with open(save_comparison_path, "a") as f:
+        row_id = 0
+        with torch.no_grad():
+            for inputs, labels in val_loader:
+                inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
+                outputs = model(inputs)
+                labels = labels.cpu().detach().numpy()
+                outputs = outputs.cpu().detach().numpy()
+                for i in range(len(inputs)):
+                    row_id += 1
+                    f.write(f"[Truth   {row_id:05d}] {str(labels[i])}\n")
+                    f.write(f"[Predict {row_id:05d}] {str(outputs[i])}\n")
 
 
 if __name__ == "__main__":
@@ -146,7 +164,7 @@ if __name__ == "__main__":
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.1)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
-    epochs = 5000
+    epochs = 100
 
     wandb_flag = True
     if wandb_flag:
