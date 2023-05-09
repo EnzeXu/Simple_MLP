@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import torch
 import pickle
 import wandb
+import time
 import math
 import torch.nn as nn
 import pandas as pd
@@ -76,11 +77,17 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
     train_loss_record = []
     valid_loss_record = []
     min_val_loss = float('Inf')
+    best_epoch = 0
+    # record_timestring_start = get_now_string()
+    record_t0 = time.time()
+    record_time_epoch_step = record_t0
+
     for epoch in range(1, epochs + 1):
         train_loss = train(model, train_loader, criterion, optimizer, device)
         valid_loss = validate(model, val_loader, criterion, device)
         if valid_loss < min_val_loss:
             min_val_loss = valid_loss
+            best_epoch = epoch
         # test_loss, test_loss_rmse = test(model, test_loader, device)
         timestring = get_now_string()
         train_loss_record.append(train_loss)
@@ -91,7 +98,13 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
             pass
         scheduler.step()
         if epoch % 100 == 0:
-            print("[{}] Epoch: {}/{}  train Loss: {:.9f}  val Loss: {:.9f}  min val Loss: {:.9f}  lr: {:.9f}".format(timestring, epoch, epochs, train_loss, valid_loss, min_val_loss, optimizer.param_groups[0]["lr"]))
+            # print("[{}] Epoch: {}/{}  train Loss: {:.9f}  val Loss: {:.9f}  min val Loss: {:.9f}  lr: {:.9f}".format(timestring, epoch, epochs, train_loss, valid_loss, min_val_loss, optimizer.param_groups[0]["lr"]))
+            record_time_epoch_step_tmp = time.time()
+            info_epoch = f'Epoch:{epoch}/{epochs}  train loss:{train_loss:.4e}  val loss:{valid_loss:.4e}  '
+            info_best = f'best epoch:{best_epoch}  min loss:{min_val_loss:.4e}  '
+            info_extended = f'lr:{optimizer.param_groups[0]["lr"]:.9e}  time:{(record_time_epoch_step_tmp - record_time_epoch_step):.2f}s  time total:{((record_time_epoch_step_tmp - record_t0) / 60.0):.2f}min  time remain:{((record_time_epoch_step_tmp - record_t0) / 60.0 / epoch * (epochs - epoch)):.2f}min'
+            record_time_epoch_step = record_time_epoch_step_tmp
+            print(info_epoch + info_best + info_extended)
 
         if epoch % 500 == 0:
             torch.save(model.state_dict(), main_path + "saves/model_{}.pt".format(timestring))
