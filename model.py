@@ -185,8 +185,8 @@ if __name__ == "__main__":
     with open(main_path + "processed/valid.pkl", "rb") as f:
         val_dataset = pickle.load(f)
 
-    train_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=1024, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
 
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     gpu_id = 2
