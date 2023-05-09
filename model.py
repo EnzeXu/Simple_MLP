@@ -19,8 +19,10 @@ from dataset import MyDataset
 class MyModel(nn.Module):
     def __init__(self, x_dim, y_dim):
         super(MyModel, self).__init__()
+        self.x_dim = x_dim
+        self.y_dim = y_dim
         self.fc = nn.Sequential(
-            nn.Linear(x_dim, 128),
+            nn.Linear(self.x_dim, 128),
             nn.BatchNorm1d(128),
             nn.Tanh(),
             nn.Linear(128, 256),
@@ -29,7 +31,7 @@ class MyModel(nn.Module):
             nn.Linear(256, 128),
             nn.BatchNorm1d(128),
             nn.Tanh(),
-            nn.Linear(128, y_dim),
+            nn.Linear(128, self.y_dim),
         )
         # print("{} layers".format(len(self.fc)))
 
@@ -83,6 +85,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
     record_timestring_start = get_now_string()
     record_t0 = time.time()
     record_time_epoch_step = record_t0
+    init_lr = optimizer.param_groups[0]["lr"]
 
     for epoch in range(1, epochs + 1):
         train_loss = train(model, train_loader, criterion, optimizer, device)
@@ -118,7 +121,30 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
         #     plt.legend()
         #     plt.show()
         #     plt.close()
-    save_comparison_folder = "record/comparison/"
+
+    record_timestring_end = get_now_string()
+    record_time_cost_min = (time.time() - record_t0) / 60.0
+    record_folder_path = "./record/"
+    if not os.path.exists(record_folder_path):
+        os.makedirs(record_folder_path)
+    with open(record_folder_path + "record.csv", "a") as f:
+        f.write("{0},{1},{2},{3:.2f},{4},{5},{6:.9f},{7:.9f},{8},{9:.9f},{10},{11}\n".format(
+            # func_name,timestring_start,timestring_end,time_cost_min,epochs,layer,activation,layer_size,lr,lr_end,scheduler,dropout,best_epoch,min_loss
+            "Simple_MLP",  # 0
+            record_timestring_start,  # 1
+            record_timestring_end,  # 2
+            record_time_cost_min,  # 3
+            epochs,  # 4
+            len(model.fc),  # 5
+            init_lr,  # 6
+            optimizer.param_groups[0]["lr"],  # 7
+            best_epoch,  # 8
+            min_val_loss,  # 9
+            model.x_dim,  # 10
+            model.y_dim,  # 11
+        ))
+
+    save_comparison_folder = "./record/comparison/"
     if not os.path.exists(save_comparison_folder):
         os.makedirs(save_comparison_folder)
     save_comparison_path = f"{save_comparison_folder}/val_{record_timestring_start}.txt"
