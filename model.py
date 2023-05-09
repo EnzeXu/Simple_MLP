@@ -11,7 +11,7 @@ import torch.nn as nn
 import pandas as pd
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from utils import get_now_string, generate_output
+from utils import get_now_string
 from tqdm import tqdm
 from dataset import MyDataset
 import os
