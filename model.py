@@ -90,8 +90,8 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
         if valid_loss < min_val_loss:
             min_val_loss = valid_loss
             best_epoch = epoch
+            torch.save(model.state_dict(), main_path + "saves/model_{}.pt".format(record_timestring_start))
         # test_loss, test_loss_rmse = test(model, test_loader, device)
-        timestring = get_now_string()
         train_loss_record.append(train_loss)
         valid_loss_record.append(valid_loss)
         try:
@@ -108,8 +108,6 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
             record_time_epoch_step = record_time_epoch_step_tmp
             print(info_epoch + info_best + info_extended)
 
-        if epoch % 500 == 0:
-            torch.save(model.state_dict(), main_path + "saves/model_{}.pt".format(timestring))
             # print("model saved to {}".format(main_path + "saves/model_{}.pt".format(timestring)))
 
         scheduler.step()
@@ -124,6 +122,8 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
     if not os.path.exists(save_comparison_folder):
         os.makedirs(save_comparison_folder)
     save_comparison_path = f"{save_comparison_folder}/val_{record_timestring_start}.txt"
+
+    model.load_state_dict(torch.load(main_path + "saves/model_{}.pt".format(record_timestring_start)))
     with open(save_comparison_path, "a") as f:
         row_id = 0
         with torch.no_grad():
@@ -163,8 +163,9 @@ if __name__ == "__main__":
     # model.load_state_dict(torch.load(main_path + "saves/model_20230228_211049_069082.pt"))
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.1)
-    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
-    epochs = 100
+    # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=1000, eta_min=0.001 * 0.1)
+    epochs = 10000
 
     wandb_flag = True
     if wandb_flag:
