@@ -17,11 +17,8 @@ from sklearn.model_selection import train_test_split
 class MyDataset(Dataset):
     def __init__(self, x_path, y_path):
         x_df = pd.read_csv(x_path)
-        print(x_path)
         y_df = pd.read_csv(y_path)
-        print(y_path)
-        print(x_df)
-        print(y_df)
+
         self.x_dim = 6
         self.y_dim = 6
         self.x_data = torch.tensor(x_df.values, dtype=torch.float32)[:, :self.x_dim]
@@ -49,6 +46,11 @@ def one_time_generate_dataset():
     print(len(train_idxs), len(val_idxs))
     train_dataset = torch.utils.data.Subset(dataset, train_idxs)
     val_dataset = torch.utils.data.Subset(dataset, val_idxs)
+    with open("processed/train_idx.pkl", "wb") as f:
+        pickle.dump(train_idxs, f)
+    with open("processed/val_idx.pkl", "wb") as f:
+        pickle.dump(val_idxs, f)
+
     with open("processed/all.pkl", "wb") as f:
         pickle.dump(dataset, f)
     with open("processed/train.pkl", "wb") as f:

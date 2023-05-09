@@ -11,7 +11,7 @@ import torch.nn as nn
 import pandas as pd
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from utils import get_now_string
+from utils import get_now_string, generate_output
 from tqdm import tqdm
 from dataset import MyDataset
 
@@ -168,6 +168,8 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                         row_id,
                         " ".join([str("{0:.6e}".format(item)) for item in outputs[i]]),
                     ))
+    print("saved comparison to {}".format(save_comparison_path))
+    generate_output(torch.load(main_path + "saves/model_{}.pt".format(record_timestring_start)), record_timestring_start)
 
 def relative_loss(prediction, target):
     criterion = nn.MSELoss(reduction="none")
@@ -203,7 +205,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.1)
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=2000, eta_min=0.001 * 0.1)
-    epochs = 10000
+    epochs = 100
 
     wandb_flag = True
     if wandb_flag:
