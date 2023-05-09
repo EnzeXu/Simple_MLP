@@ -170,7 +170,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                         " ".join([str("{0:.6e}".format(item)) for item in outputs[i]]),
                     ))
     print("saved comparison to {}".format(save_comparison_path))
-    generate_output(torch.load(main_path + "saves/model_{}.pt".format(record_timestring_start)), record_timestring_start)
+    generate_output(main_path + "saves/model_{}.pt".format(record_timestring_start), record_timestring_start)
 
 def relative_loss(prediction, target):
     criterion = nn.MSELoss(reduction="none")
@@ -197,6 +197,7 @@ def generate_output(pt_path, timestring=None):
     print("using {}".format(device))
 
     model = MyModel(x_dim=dataset.x_dim, y_dim=dataset.y_dim).to(device)
+    # print("load pt from {}".format(pt_path))
     model.load_state_dict(torch.load(pt_path))
 
     save_output_folder = "./record/output/"
