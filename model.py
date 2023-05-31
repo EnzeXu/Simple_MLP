@@ -226,6 +226,7 @@ def generate_output(pt_path, timestring=None):
     with open(save_output_path, "a") as f:
         f.write("id,[x],[y],[y_pred]\n")
         row_id = 0
+        sorted_output = []
         with torch.no_grad():
             for inputs, labels in val_loader:
                 inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
@@ -235,15 +236,24 @@ def generate_output(pt_path, timestring=None):
                 outputs = outputs.cpu().detach().numpy()
 
                 for i in range(len(inputs)):
-                    print("[model] input: {} / labels: {} / output: {}".format(str(list(inputs[i])), str(list(labels[i])), str(list(outputs[i]))))
-                    print("[original] x: {} / y: {} ".format(str(list(x_data_raw[val_idx[row_id]])), str(list(y_data_raw[val_idx[row_id]]))))
-                    f.write("{0:d},{1},{2},{3}\n".format(
-                        val_idx[row_id],
+                    sorted_output.append(
+                        [val_idx[row_id],
                         ",".join([str("{0:.12e}".format(item)) for item in x_data_raw[val_idx[row_id]]]),
                         ",".join([str("{0:.12e}".format(item)) for item in y_data_raw[val_idx[row_id]]]),
-                        ",".join([str("{0:.12e}".format(item)) for item in outputs[i]]),
-                    ))
+                        ",".join([str("{0:.12e}".format(item)) for item in outputs[i]])]
+                    )
                     row_id += 1
+
+        sorted_output = sorted(sorted_output, key=lambda x: x[0])
+        for one_output in sorted_output:
+            # print("[model] input: {} / labels: {} / output: {}".format(str(list(inputs[i])), str(list(labels[i])), str(list(outputs[i]))))
+            # print("[original] x: {} / y: {} ".format(str(list(x_data_raw[val_idx[row_id]])), str(list(y_data_raw[val_idx[row_id]]))))
+            f.write("{0:d},{1},{2},{3}\n".format(
+                one_output[0],
+                one_output[1],
+                one_output[2],
+                one_output[3],
+            ))
 
 
 if __name__ == "__main__":
