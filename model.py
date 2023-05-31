@@ -29,9 +29,9 @@ class MyModel(nn.Module):
             nn.Linear(128, 256),
             nn.BatchNorm1d(256),
             nn.ReLU(),
-            # nn.Linear(256, 256),  #
-            # nn.BatchNorm1d(256),  #
-            # nn.Tanh(),  #
+            nn.Linear(256, 256),  #
+            nn.BatchNorm1d(256),  #
+            nn.ReLU(),  #
             nn.Linear(256, 128),
             nn.BatchNorm1d(128),
             nn.ReLU(),
