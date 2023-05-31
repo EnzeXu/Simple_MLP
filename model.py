@@ -259,7 +259,7 @@ if __name__ == "__main__":
     val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
 
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    gpu_id = 2
+    gpu_id = 0
     use_cuda = torch.cuda.is_available()
     if use_cuda:
         device = torch.device('cuda', gpu_id)
