@@ -104,7 +104,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
         except:
             pass
         scheduler.step()
-        if epoch % 100 == 0:
+        if epoch % 10 == 0:
             # print("[{}] Epoch: {}/{}  train Loss: {:.9f}  val Loss: {:.9f}  min val Loss: {:.9f}  lr: {:.9f}".format(timestring, epoch, epochs, train_loss, valid_loss, min_val_loss, optimizer.param_groups[0]["lr"]))
             record_time_epoch_step_tmp = time.time()
             info_epoch = f'Epoch:{epoch}/{epochs}  train loss:{train_loss:.4e}  val loss:{valid_loss:.4e}  '
@@ -272,8 +272,8 @@ if __name__ == "__main__":
     criterion = relative_loss  # nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.1)
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=2000, eta_min=0.001 * 0.1)
-    epochs = 10000
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200, eta_min=0.000001 * 0.1)
+    epochs = 1000
     wandb_flag = True
     if wandb_flag:
         with wandb.init(project='Simple_MLP', name='test'):
