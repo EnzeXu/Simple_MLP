@@ -15,14 +15,14 @@ from sklearn.model_selection import train_test_split
 
 
 class MyDataset(Dataset):
-    def __init__(self, x_path, y_path):
-        x_df = pd.read_csv(x_path)
-        y_df = pd.read_csv(y_path)
+    def __init__(self, path):
+        print(f"loading data from {path} ...")
+        df = pd.read_csv(path)
 
-        self.x_dim = 6
-        self.y_dim = 6
-        self.x_data = torch.tensor(x_df.values, dtype=torch.float32)[:, [1, 3, 5, 7, 9, 11]]
-        self.y_data = torch.tensor(y_df.values, dtype=torch.float32)[:, :self.y_dim]
+        self.x_data = torch.tensor(df.values, dtype=torch.float32)[:, :3]
+        self.y_data = torch.tensor(df.values, dtype=torch.float32)[:, 3:4]
+        self.x_dim = self.x_data.shape[-1]
+        self.y_dim = self.y_data.shape[-1]
         print(f"Full x shape: {self.x_data.shape}")
         print(f"Full y shape: {self.y_data.shape}")
 
@@ -37,7 +37,7 @@ class MyDataset(Dataset):
 
 def one_time_generate_dataset():
     t0 = time.time()
-    dataset = MyDataset("data/x.csv", "data/y.csv")
+    dataset = MyDataset("data/dataset_osci_0_1_2.csv")
 
     print(dataset.x_data[0], dataset.y_data[0])
 
@@ -51,13 +51,18 @@ def one_time_generate_dataset():
     with open("processed/val_idx.pkl", "wb") as f:
         pickle.dump(val_idxs, f)
 
+    with open("processed/x_raw.pkl", "wb") as f:
+        pickle.dump(dataset.x_data, f)
+    with open("processed/y_raw.pkl", "wb") as f:
+        pickle.dump(dataset.y_data, f)
+
     with open("processed/all.pkl", "wb") as f:
         pickle.dump(dataset, f)
     with open("processed/train.pkl", "wb") as f:
         pickle.dump(train_dataset, f)
     with open("processed/valid.pkl", "wb") as f:
         pickle.dump(val_dataset, f)
-    print("cost {} min".format((time.time() - t0) / 60.0))
+    print("cost {0:.6f} min".format((time.time() - t0) / 60.0))
 
 
 if __name__ == "__main__":

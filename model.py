@@ -208,10 +208,16 @@ def generate_output(pt_path, timestring=None):
         timestring = get_now_string()
     save_output_path = f"{save_output_folder}/output_{timestring}.txt"
 
-    x_df = pd.read_csv("data/x.csv")
-    y_df = pd.read_csv("data/y.csv")
-    x_data_raw = x_df.values
-    y_data_raw = y_df.values
+    # x_df = pd.read_csv("data/x.csv")
+    # y_df = pd.read_csv("data/y.csv")
+    # x_data_raw = x_df.values
+    # y_data_raw = y_df.values
+
+    with open("processed/x_raw.pkl", "rb") as f:
+        x_data_raw = pickle.load(f)
+    with open("processed/y_raw.pkl", "rb") as f:
+        y_data_raw = pickle.load(f)
+
 
     with open("processed/val_idx.pkl", "rb") as f:
         val_idx = pickle.load(f)
