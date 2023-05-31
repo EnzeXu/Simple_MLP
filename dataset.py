@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split
 class MyDataset(Dataset):
     def __init__(self, path):
         print(f"loading data from {path} ...")
-        df = pd.read_csv(path)
+        df = pd.read_csv(path, header=None)
 
         self.x_data = torch.tensor(df.values, dtype=torch.float32)[:, :3]
         self.y_data = torch.tensor(df.values, dtype=torch.float32)[:, 3:4]
