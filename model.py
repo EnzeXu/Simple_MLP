@@ -189,7 +189,7 @@ def generate_output(pt_path, timestring=None):
         val_dataset = pickle.load(f)
     val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
 
-    gpu_id = 2
+    gpu_id = 0
     use_cuda = torch.cuda.is_available()
     if use_cuda:
         device = torch.device('cuda', gpu_id)
