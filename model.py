@@ -164,11 +164,11 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                     row_id += 1
                     f.write("[Truth   {0:05d}] {1}\n".format(
                         row_id,
-                        " ".join([str("{0:.6e}".format(item)) for item in labels[i]]),
+                        " ".join([str("{0:.12f}".format(item)) for item in labels[i]]),
                     ))
                     f.write("[Predict {0:05d}] {1}\n".format(
                         row_id,
-                        " ".join([str("{0:.6e}".format(item)) for item in outputs[i]]),
+                        " ".join([str("{0:.12f}".format(item)) for item in outputs[i]]),
                     ))
     print("saved comparison to {}".format(save_comparison_path))
     generate_output(main_path + "saves/model_{}.pt".format(record_timestring_start), record_timestring_start)
@@ -238,9 +238,9 @@ def generate_output(pt_path, timestring=None):
                 for i in range(len(inputs)):
                     sorted_output.append(
                         [val_idx[row_id],
-                        ",".join([str("{0:.12e}".format(item)) for item in x_data_raw[val_idx[row_id]]]),
-                        ",".join([str("{0:.12e}".format(item)) for item in y_data_raw[val_idx[row_id]]]),
-                        ",".join([str("{0:.12e}".format(item)) for item in outputs[i]])]
+                        ",".join([str("{0:.12f}".format(item)) for item in x_data_raw[val_idx[row_id]]]),
+                        ",".join([str("{0:.12f}".format(item)) for item in y_data_raw[val_idx[row_id]]]),
+                        ",".join([str("{0:.12f}".format(item)) for item in outputs[i]])]
                     )
                     row_id += 1
 
