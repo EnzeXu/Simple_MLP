@@ -268,7 +268,6 @@ if __name__ == "__main__":
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=2000, eta_min=0.001 * 0.1)
     epochs = 10000
-
     wandb_flag = True
     if wandb_flag:
         with wandb.init(project='Simple_MLP', name='test'):
