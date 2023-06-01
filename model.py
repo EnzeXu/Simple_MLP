@@ -11,7 +11,7 @@ import torch.nn as nn
 import pandas as pd
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from utils import get_now_string
+from utils import get_now_string, decode
 from tqdm import tqdm
 from dataset import MyDataset
 import os
@@ -179,7 +179,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
 def relative_loss(prediction, target):
     criterion = nn.MSELoss(reduction="none")
     mse_non_reduce = criterion(prediction, target)
-    errors = mse_non_reduce / (torch.pow(target, 2) + 1e-4)
+    errors = mse_non_reduce / (torch.pow(target, 2) + 1e-6)
     errors = torch.mean(errors)
     return errors
 
@@ -225,6 +225,22 @@ def generate_output(pt_path, timestring=None):
     with open("processed/val_idx.pkl", "rb") as f:
         val_idx = pickle.load(f)
 
+
+    with open("processed/record_min_max.pkl", "rb") as f:
+        record = pickle.load(f)
+    x1_min = record["x1_min"]
+    x1_max = record["x1_max"]
+    x2_min = record["x2_min"]
+    x2_max = record["x2_max"]
+    x3_min = record["x3_min"]
+    x3_max = record["x3_max"]
+    y_min = record["y_min"]
+    y_max = record["y_max"]
+    x_data_raw[:, 0:1] = decode(x_data_raw[:, 0:1], x1_min, x1_max)
+    x_data_raw[:, 1:2] = decode(x_data_raw[:, 1:2], x2_min, x2_max)
+    x_data_raw[:, 2:3] = decode(x_data_raw[:, 2:3], x3_min, x3_max)
+    y_data_raw[:, :] = decode(y_data_raw[:, :], y_min, y_max)
+
     print("saved output to {}".format(save_output_path))
     with open(save_output_path, "a") as f:
         f.write("id,[x],[y],[y_pred]\n")
@@ -237,6 +253,8 @@ def generate_output(pt_path, timestring=None):
                 inputs = inputs.cpu().detach().numpy()
                 labels = labels.cpu().detach().numpy()
                 outputs = outputs.cpu().detach().numpy()
+
+                outputs = decode(outputs, y_min, y_max)
 
                 for i in range(len(inputs)):
                     sorted_output.append(
