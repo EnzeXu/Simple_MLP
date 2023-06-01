@@ -24,9 +24,11 @@ class MyModel(nn.Module):
         self.y_dim = y_dim
         self.fc = nn.Sequential(
             nn.Linear(self.x_dim, 128),
+            nn.Dropout(0.2),
             nn.BatchNorm1d(128),
             nn.ReLU(),
             nn.Linear(128, 128),
+            nn.Dropout(0.2),
             nn.BatchNorm1d(128),
             nn.ReLU(),
             # nn.Linear(256, 256),  #
@@ -250,7 +252,6 @@ def generate_output(pt_path, timestring=None, device=None):
     x_data_raw[:, 2:3] = decode(x_data_raw[:, 2:3], x3_min, x3_max)
     y_data_raw[:, :] = decode(y_data_raw[:, :], y_min, y_max)
 
-    print("saved val output to {}".format(save_output_path_val))
     with open(save_output_path_val, "a") as f:
         f.write("id,[x],[y],[y_pred]\n")
         row_id = 0
@@ -284,6 +285,7 @@ def generate_output(pt_path, timestring=None, device=None):
                 one_output[2],
                 one_output[3],
             ))
+    print("saved val output to {}".format(save_output_path_val))
 
     with open(save_output_path_train, "a") as f:
         f.write("id,[x],[y],[y_pred]\n")
@@ -318,6 +320,7 @@ def generate_output(pt_path, timestring=None, device=None):
                 one_output[2],
                 one_output[3],
             ))
+    print("saved train output to {}".format(save_output_path_train))
 
 
 if __name__ == "__main__":
