@@ -117,6 +117,8 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
             print(info_epoch + info_best + info_extended)
 
             # print("model saved to {}".format(main_path + "saves/model_{}.pt".format(timestring)))
+        if epoch % 200 == 0:
+            generate_output(main_path + "saves/model_{}.pt".format(record_timestring_start), record_timestring_start, device)
 
         scheduler.step()
         # if (epoch + 1) % 10 == 0:
@@ -174,7 +176,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                         " ".join([str("{0:.12f}".format(item)) for item in outputs[i]]),
                     ))
     print("saved comparison to {}".format(save_comparison_path))
-    generate_output(main_path + "saves/model_{}.pt".format(record_timestring_start), record_timestring_start)
+    generate_output(main_path + "saves/model_{}.pt".format(record_timestring_start), record_timestring_start, device)
 
 def relative_loss(prediction, target):
     criterion = nn.MSELoss(reduction="none")
@@ -184,7 +186,7 @@ def relative_loss(prediction, target):
     return errors
 
 
-def generate_output(pt_path, timestring=None):
+def generate_output(pt_path, timestring=None, device=None):
     main_path = "./"
     with open(main_path + "processed/all.pkl", "rb") as f:
         dataset = pickle.load(f)
@@ -192,13 +194,14 @@ def generate_output(pt_path, timestring=None):
         val_dataset = pickle.load(f)
     val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
 
-    gpu_id = 0
-    use_cuda = torch.cuda.is_available()
-    if use_cuda:
-        device = torch.device('cuda', gpu_id)
-    else:
-        device = torch.device('cpu')
-    print("using {}".format(device))
+    if not device:
+        gpu_id = 0
+        use_cuda = torch.cuda.is_available()
+        if use_cuda:
+            device = torch.device('cuda', gpu_id)
+        else:
+            device = torch.device('cpu')
+        print("using {}".format(device))
 
     model = MyModel(x_dim=dataset.x_dim, y_dim=dataset.y_dim).to(device)
     # print("load pt from {}".format(pt_path))
