@@ -192,7 +192,10 @@ def generate_output(pt_path, timestring=None, device=None):
         dataset = pickle.load(f)
     with open(main_path + "processed/valid.pkl", "rb") as f:
         val_dataset = pickle.load(f)
-    val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
+    with open(main_path + "processed/train.pkl", "rb") as f:
+        train_dataset = pickle.load(f)
+    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=False)
 
     if not device:
         gpu_id = 0
@@ -287,7 +290,7 @@ def generate_output(pt_path, timestring=None, device=None):
         row_id = 0
         sorted_output_train = []
         with torch.no_grad():
-            for inputs, labels in val_loader:
+            for inputs, labels in train_loader:
                 inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
                 outputs = model(inputs)
                 inputs = inputs.cpu().detach().numpy()
