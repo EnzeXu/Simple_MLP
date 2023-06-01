@@ -212,7 +212,8 @@ def generate_output(pt_path, timestring=None, device=None):
         os.makedirs(save_output_folder)
     if not timestring:
         timestring = get_now_string()
-    save_output_path = f"{save_output_folder}/output_{timestring}.txt"
+    save_output_path_val = f"{save_output_folder}/output_{timestring}_val.txt"
+    save_output_path_train = f"{save_output_folder}/output_{timestring}_train.txt"
 
     # x_df = pd.read_csv("data/x.csv")
     # y_df = pd.read_csv("data/y.csv")
@@ -227,6 +228,8 @@ def generate_output(pt_path, timestring=None, device=None):
 
     with open("processed/val_idx.pkl", "rb") as f:
         val_idx = pickle.load(f)
+    with open("processed/train_idx.pkl", "rb") as f:
+        train_idx = pickle.load(f)
 
 
     with open("processed/record_min_max.pkl", "rb") as f:
@@ -244,11 +247,11 @@ def generate_output(pt_path, timestring=None, device=None):
     x_data_raw[:, 2:3] = decode(x_data_raw[:, 2:3], x3_min, x3_max)
     y_data_raw[:, :] = decode(y_data_raw[:, :], y_min, y_max)
 
-    print("saved output to {}".format(save_output_path))
-    with open(save_output_path, "a") as f:
+    print("saved val output to {}".format(save_output_path_val))
+    with open(save_output_path_val, "a") as f:
         f.write("id,[x],[y],[y_pred]\n")
         row_id = 0
-        sorted_output = []
+        sorted_output_val = []
         with torch.no_grad():
             for inputs, labels in val_loader:
                 inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
@@ -260,7 +263,7 @@ def generate_output(pt_path, timestring=None, device=None):
                 outputs = decode(outputs, y_min, y_max)
 
                 for i in range(len(inputs)):
-                    sorted_output.append(
+                    sorted_output_val.append(
                         [val_idx[row_id],
                         ",".join([str("{0:.12f}".format(item)) for item in x_data_raw[val_idx[row_id]]]),
                         ",".join([str("{0:.12f}".format(item)) for item in y_data_raw[val_idx[row_id]]]),
@@ -268,8 +271,42 @@ def generate_output(pt_path, timestring=None, device=None):
                     )
                     row_id += 1
 
-        sorted_output = sorted(sorted_output, key=lambda x: x[0])
-        for one_output in sorted_output:
+        sorted_output_val = sorted(sorted_output_val, key=lambda x: x[0])
+        for one_output in sorted_output_val:
+            # print("[model] input: {} / labels: {} / output: {}".format(str(list(inputs[i])), str(list(labels[i])), str(list(outputs[i]))))
+            # print("[original] x: {} / y: {} ".format(str(list(x_data_raw[val_idx[row_id]])), str(list(y_data_raw[val_idx[row_id]]))))
+            f.write("{0:d},{1},{2},{3}\n".format(
+                one_output[0],
+                one_output[1],
+                one_output[2],
+                one_output[3],
+            ))
+
+    with open(save_output_path_train, "a") as f:
+        f.write("id,[x],[y],[y_pred]\n")
+        row_id = 0
+        sorted_output_train = []
+        with torch.no_grad():
+            for inputs, labels in val_loader:
+                inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
+                outputs = model(inputs)
+                inputs = inputs.cpu().detach().numpy()
+                labels = labels.cpu().detach().numpy()
+                outputs = outputs.cpu().detach().numpy()
+
+                outputs = decode(outputs, y_min, y_max)
+
+                for i in range(len(inputs)):
+                    sorted_output_train.append(
+                        [train_idx[row_id],
+                        ",".join([str("{0:.12f}".format(item)) for item in x_data_raw[train_idx[row_id]]]),
+                        ",".join([str("{0:.12f}".format(item)) for item in y_data_raw[train_idx[row_id]]]),
+                        ",".join([str("{0:.12f}".format(item)) for item in outputs[i]])]
+                    )
+                    row_id += 1
+
+        save_output_path_train = sorted(save_output_path_train, key=lambda x: x[0])
+        for one_output in save_output_path_train:
             # print("[model] input: {} / labels: {} / output: {}".format(str(list(inputs[i])), str(list(labels[i])), str(list(outputs[i]))))
             # print("[original] x: {} / y: {} ".format(str(list(x_data_raw[val_idx[row_id]])), str(list(y_data_raw[val_idx[row_id]]))))
             f.write("{0:d},{1},{2},{3}\n".format(
