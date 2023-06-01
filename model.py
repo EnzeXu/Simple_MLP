@@ -23,19 +23,19 @@ class MyModel(nn.Module):
         self.x_dim = x_dim
         self.y_dim = y_dim
         self.fc = nn.Sequential(
-            nn.Linear(self.x_dim, 64),
-            nn.BatchNorm1d(64),
+            nn.Linear(self.x_dim, 128),
+            nn.BatchNorm1d(128),
             nn.ReLU(),
-            # nn.Linear(128, 256),
-            # nn.BatchNorm1d(256),
-            # nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
             # nn.Linear(256, 256),  #
             # nn.BatchNorm1d(256),  #
             # nn.ReLU(),  #
             # nn.Linear(256, 128),
             # nn.BatchNorm1d(128),
             # nn.ReLU(),
-            nn.Linear(64, self.y_dim),
+            nn.Linear(128, self.y_dim),
         )
         # print("{} layers".format(len(self.fc)))
 
@@ -304,7 +304,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.1)
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / 1000 + 1))
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200, eta_min=0.000001 * 0.1)
-    epochs = 30
+    epochs = 3000
     wandb_flag = True
     if wandb_flag:
         with wandb.init(project='Simple_MLP', name='test'):
