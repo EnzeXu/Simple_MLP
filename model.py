@@ -117,7 +117,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
             print(info_epoch + info_best + info_extended)
 
             # print("model saved to {}".format(main_path + "saves/model_{}.pt".format(timestring)))
-        if epoch % 200 == 0:
+        if epoch % 50 == 0:
             generate_output(main_path + "saves/model_{}.pt".format(record_timestring_start), record_timestring_start, device)
 
         scheduler.step()
