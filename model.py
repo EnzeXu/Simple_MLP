@@ -308,8 +308,8 @@ def generate_output(pt_path, timestring=None, device=None):
                     )
                     row_id += 1
 
-        save_output_path_train = sorted(save_output_path_train, key=lambda x: x[0])
-        for one_output in save_output_path_train:
+        sorted_output_train = sorted(sorted_output_train, key=lambda x: x[0])
+        for one_output in sorted_output_train:
             # print("[model] input: {} / labels: {} / output: {}".format(str(list(inputs[i])), str(list(labels[i])), str(list(outputs[i]))))
             # print("[original] x: {} / y: {} ".format(str(list(x_data_raw[val_idx[row_id]])), str(list(y_data_raw[val_idx[row_id]]))))
             f.write("{0:d},{1},{2},{3}\n".format(
