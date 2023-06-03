@@ -133,8 +133,6 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     ax4.tick_params(axis='z', labelsize=10)
     ax4.set_title("Remarkable Error ($e>0.1$, $n_{{R}}={0:d}$) Distribution".format(len(data_error_remarkable)), fontsize=20)  # , len(data_error_remarkable) / len(data_error) * 100.0
 
-
-
     #remarkable
 
     # plt.show()
@@ -144,6 +142,9 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     # plt.subplots_adjust(right=0.8)
     plt.savefig(save_path, dpi=400)
     plt.close()
+    print("max", np.max(data_error[:, -1]))
+    print("min", np.min(data_error[:, -1]))
+    plot_value_distribution(data_error[:, -1], save_path=save_path.replace(".png", "_distribution.png"))
 
 def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None):
     with open(txt_path, "r") as f:
@@ -174,14 +175,48 @@ def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None):
     print(f"saved \"{title}\" to {save_path}")
 
 
+def plot_value_distribution(data, save_path):
+    fig = plt.figure(figsize=(24, 6))
+    bin_edges = np.arange(0.0, 2.0, 0.05)
+
+    # Calculate the histogram of the data using the defined bins
+    hist, _ = np.histogram(data, bins=bin_edges)
+
+    # Calculate the frequencies as the relative count in each bin
+    frequencies = hist / len(data)
+
+    ax = fig.add_subplot(111)
+
+    # Plot the bars with the frequencies
+    bars = ax.bar(bin_edges[:-1], frequencies, width=0.05, align='edge', color="orange")
+
+    ax.set_xlabel('Relative Error')
+    ax.set_ylabel('Frequency')
+    ax.set_title('Error Distribution')
+
+    # Set x-axis ticks to match the desired range [0.1, 0.2, ..., 0.9, 1.0]
+    x_ticks = np.arange(0.0, 2.0, 0.05)
+    plt.xticks(x_ticks)
+
+    # Add count labels on top of each bar
+    for i, bar in enumerate(bars):
+        height = bar.get_height()
+        ax.annotate(f'{hist[i]:d}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3), textcoords='offset points',
+                    ha='center', va='bottom')
+
+    plt.savefig(save_path, dpi=400)
+    plt.close()
+
 if __name__ == "__main__":
     # a = np.asarray([1.0, 2.0, 3.0])
     # a = torch.tensor([1.0, 2.0, 3.0])
     # print(my_min_max(a))
-    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_best_train.txt", "test/comparison_20230603_044727_785177_best_train.png", title="Results of the Train Set (n=28944) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_best_val.txt", "test/comparison_20230603_044727_785177_best_test.png", title="Results of the Test Set (n=7237) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_last_train.txt", "test/comparison_20230603_044727_785177_last_train.png", title="Results of the Train Set (n=28944) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_last_val.txt", "test/comparison_20230603_044727_785177_last_test.png", title="Results of the Test Set (n=7237) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    timestring = "20230603_044727_785177"
+    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_train.txt", f"test/comparison_{timestring}_best_train.png", title="Results of the Train Set (n=28944) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_val.txt", f"test/comparison_{timestring}_best_test.png", title="Results of the Test Set (n=7237) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt", f"test/comparison_{timestring}_last_train.png", title="Results of the Train Set (n=28944) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt", f"test/comparison_{timestring}_last_test.png", title="Results of the Test Set (n=7237) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
     # a = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
     # a = np.asarray(a)
     # np.random.shuffle(a)
