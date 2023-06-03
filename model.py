@@ -120,7 +120,10 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
 
             # print("model saved to {}".format(main_path + "saves/model_{}.pt".format(timestring)))
         if epoch % 50 == 0 or epoch == epochs:
-            generate_output(main_path + "saves/model_{}_best.pt".format(record_timestring_start), record_timestring_start, device)
+            generate_output(main_path + "saves/model_{}_best.pt".format(record_timestring_start),
+                            record_timestring_start, device, "best")
+            generate_output(main_path + "saves/model_{}_last.pt".format(record_timestring_start),
+                            record_timestring_start, device, "last")
             torch.save(model.state_dict(), main_path + "saves/model_{}_last.pt".format(record_timestring_start))
 
         scheduler.step()
@@ -179,8 +182,6 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                         " ".join([str("{0:.12f}".format(item)) for item in outputs[i]]),
                     ))
     print("saved comparison to {}".format(save_comparison_path))
-    generate_output(main_path + "saves/model_{}_best.pt".format(record_timestring_start), record_timestring_start, device, "best")
-    generate_output(main_path + "saves/model_{}_last.pt".format(record_timestring_start), record_timestring_start, device, "last")
 
 def relative_loss(prediction, target):
     criterion = nn.MSELoss(reduction="none")
