@@ -100,7 +100,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
         if valid_loss < min_val_loss:
             min_val_loss = valid_loss
             best_epoch = epoch
-            torch.save(model.state_dict(), main_path + "saves/model_{}.pt".format(record_timestring_start))
+            torch.save(model.state_dict(), main_path + "saves/model_{}_best.pt".format(record_timestring_start))
         # test_loss, test_loss_rmse = test(model, test_loader, device)
         train_loss_record.append(train_loss)
         valid_loss_record.append(valid_loss)
@@ -119,8 +119,9 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
             print(info_epoch + info_best + info_extended)
 
             # print("model saved to {}".format(main_path + "saves/model_{}.pt".format(timestring)))
-        if epoch % 50 == 0:
-            generate_output(main_path + "saves/model_{}.pt".format(record_timestring_start), record_timestring_start, device)
+        if epoch % 50 == 0 or epoch == epochs:
+            generate_output(main_path + "saves/model_{}_best.pt".format(record_timestring_start), record_timestring_start, device)
+            torch.save(model.state_dict(), main_path + "saves/model_{}_last.pt".format(record_timestring_start))
 
         scheduler.step()
         # if (epoch + 1) % 10 == 0:
@@ -158,7 +159,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
         os.makedirs(save_comparison_folder)
     save_comparison_path = f"{save_comparison_folder}/val_{record_timestring_start}.txt"
 
-    model.load_state_dict(torch.load(main_path + "saves/model_{}.pt".format(record_timestring_start)))
+    model.load_state_dict(torch.load(main_path + "saves/model_{}_best.pt".format(record_timestring_start)))
     with open(save_comparison_path, "a") as f:
         row_id = 0
         with torch.no_grad():
@@ -178,7 +179,8 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                         " ".join([str("{0:.12f}".format(item)) for item in outputs[i]]),
                     ))
     print("saved comparison to {}".format(save_comparison_path))
-    generate_output(main_path + "saves/model_{}.pt".format(record_timestring_start), record_timestring_start, device)
+    generate_output(main_path + "saves/model_{}_best.pt".format(record_timestring_start), record_timestring_start, device, "best")
+    generate_output(main_path + "saves/model_{}_last.pt".format(record_timestring_start), record_timestring_start, device, "last")
 
 def relative_loss(prediction, target):
     criterion = nn.MSELoss(reduction="none")
@@ -188,7 +190,7 @@ def relative_loss(prediction, target):
     return errors
 
 
-def generate_output(pt_path, timestring=None, device=None):
+def generate_output(pt_path, timestring=None, device=None, pt_type="test"):
     main_path = "./"
     with open(main_path + "processed/all.pkl", "rb") as f:
         dataset = pickle.load(f)
@@ -217,8 +219,8 @@ def generate_output(pt_path, timestring=None, device=None):
         os.makedirs(save_output_folder)
     if not timestring:
         timestring = get_now_string()
-    save_output_path_val = f"{save_output_folder}/output_{timestring}_val.txt"
-    save_output_path_train = f"{save_output_folder}/output_{timestring}_train.txt"
+    save_output_path_val = f"{save_output_folder}/output_{timestring}_{pt_type}_val.txt"
+    save_output_path_train = f"{save_output_folder}/output_{timestring}_{pt_type}_train.txt"
 
     # x_df = pd.read_csv("data/x.csv")
     # y_df = pd.read_csv("data/y.csv")
@@ -252,7 +254,7 @@ def generate_output(pt_path, timestring=None, device=None):
     x_data_raw[:, 2:3] = decode(x_data_raw[:, 2:3], x3_min, x3_max)
     y_data_raw[:, :] = decode(y_data_raw[:, :], y_min, y_max)
 
-    with open(save_output_path_val, "a") as f:
+    with open(save_output_path_val, "w") as f:
         f.write("id,[x],[y],[y_pred]\n")
         row_id = 0
         sorted_output_val = []
@@ -287,7 +289,7 @@ def generate_output(pt_path, timestring=None, device=None):
             ))
     print("saved val output to {}".format(save_output_path_val))
 
-    with open(save_output_path_train, "a") as f:
+    with open(save_output_path_train, "w") as f:
         f.write("id,[x],[y],[y_pred]\n")
         row_id = 0
         sorted_output_train = []
@@ -346,7 +348,7 @@ if __name__ == "__main__":
 
     model = MyModel(x_dim=dataset.x_dim, y_dim=dataset.y_dim).to(device)
     # model.load_state_dict(torch.load(main_path + "saves/model_20230228_211049_069082.pt"))
-    epochs = 1000
+    epochs = 30
     criterion = nn.MSELoss()  #  relative_loss  # nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.01)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / (0.01 * epochs) + 1))
