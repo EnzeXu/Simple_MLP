@@ -352,7 +352,7 @@ if __name__ == "__main__":
     # model.load_state_dict(torch.load(main_path + "saves/model_20230228_211049_069082.pt"))
     epochs = 1000
     criterion = nn.MSELoss()  #  relative_loss  # nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    optimizer = optim.Adam(model.parameters(), lr=0.1)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / (0.01 * epochs) + 1))
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200, eta_min=0.000001 * 0.1)
 

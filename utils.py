@@ -38,8 +38,12 @@ def decode(data_encoded, data_min, data_max):
 
 
 def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkable, save_path, title=None):
-    data_truth = data_truth[:]
-    data_prediction = data_prediction[:]
+    # data_truth = data_truth
+    # data_prediction = data_prediction
+    np.random.shuffle(data_truth)
+    np.random.shuffle(data_prediction)
+    np.random.shuffle(data_error)
+    np.random.shuffle(data_error_remarkable)
     fig = plt.figure(figsize=(16, 16))
 
     truth_y_min = np.min(data_truth[:, -1])
@@ -47,24 +51,28 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     error_y_min = np.min(data_error[:, -1])
     error_y_max = np.max(data_error[:, -1])
 
+    x_label = "k_hyz"
+    y_label = "k_pyx"
+    z_label = "k_smzx"
+
     ax1 = fig.add_subplot(221, projection='3d')
     x = [point[0] for point in data_truth]
     y = [point[1] for point in data_truth]
     z = [point[2] for point in data_truth]
     val = [point[3] for point in data_truth]
 
-    cmap = 'jet'
+    cmap = 'hot'
 
-    scatter = ax1.scatter(x, y, z, c=val, cmap=cmap, alpha=0.8)
+    scatter = ax1.scatter(x, y, z, c=val, cmap=cmap, alpha=0.4)
     colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=truth_y_min, vmax=truth_y_max)), ax=ax1, shrink=0.5)
 
-    ax1.set_xlabel('X')
-    ax1.set_ylabel('Y')
-    ax1.set_zlabel('Z')
+    ax1.set_xlabel(x_label)
+    ax1.set_ylabel(y_label)
+    ax1.set_zlabel(z_label)
     ax1.tick_params(axis='x', labelsize=10)
     ax1.tick_params(axis='y', labelsize=10)
     ax1.tick_params(axis='z', labelsize=10)
-    ax1.set_title("Truth of Y", fontsize=20)
+    ax1.set_title("Truth of CYCLE_TIME", fontsize=20)
 
 
     ax2 = fig.add_subplot(222, projection='3d')
@@ -73,18 +81,18 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     z = [point[2] for point in data_prediction]
     val = [point[3] for point in data_prediction]
 
-    cmap = 'jet'
+    cmap = 'hot'
 
-    scatter = ax2.scatter(x, y, z, c=val, cmap=cmap, alpha=0.8)
+    scatter = ax2.scatter(x, y, z, c=val, cmap=cmap, alpha=0.4)
     colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=truth_y_min, vmax=truth_y_max)), ax=ax2, shrink=0.5)
 
-    ax2.set_xlabel('X')
-    ax2.set_ylabel('Y')
-    ax2.set_zlabel('Z')
+    ax2.set_xlabel(x_label)
+    ax2.set_ylabel(y_label)
+    ax2.set_zlabel(z_label)
     ax2.tick_params(axis='x', labelsize=10)
     ax2.tick_params(axis='y', labelsize=10)
     ax2.tick_params(axis='z', labelsize=10)
-    ax2.set_title("Prediction of Y", fontsize=20)
+    ax2.set_title("Prediction of CYCLE_TIME", fontsize=20)
 
     ax3 = fig.add_subplot(223, projection='3d')
     x = [point[0] for point in data_error]
@@ -94,12 +102,12 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
 
     cmap = 'coolwarm'
 
-    scatter = ax3.scatter(x, y, z, c=val, cmap=cmap, alpha=0.8)
+    scatter = ax3.scatter(x, y, z, c=val, cmap=cmap, alpha=0.4)
     colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=error_y_min, vmax=error_y_max)), ax=ax3, shrink=0.5)
 
-    ax3.set_xlabel('X')
-    ax3.set_ylabel('Y')
-    ax3.set_zlabel('Z')
+    ax3.set_xlabel(x_label)
+    ax3.set_ylabel(y_label)
+    ax3.set_zlabel(z_label)
     ax3.tick_params(axis='x', labelsize=10)
     ax3.tick_params(axis='y', labelsize=10)
     ax3.tick_params(axis='z', labelsize=10)
@@ -113,17 +121,17 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
 
     cmap = 'coolwarm'
 
-    scatter = ax4.scatter(x, y, z, c=val, cmap=cmap, alpha=0.8)
+    scatter = ax4.scatter(x, y, z, c=val, cmap=cmap, alpha=0.4)
     colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=error_y_min, vmax=error_y_max)), ax=ax4,
                             shrink=0.5)
 
-    ax4.set_xlabel('X')
-    ax4.set_ylabel('Y')
-    ax4.set_zlabel('Z')
+    ax4.set_xlabel(x_label)
+    ax4.set_ylabel(y_label)
+    ax4.set_zlabel(z_label)
     ax4.tick_params(axis='x', labelsize=10)
     ax4.tick_params(axis='y', labelsize=10)
     ax4.tick_params(axis='z', labelsize=10)
-    ax4.set_title("Remarkable Error (e > 10.0%) Distribution", fontsize=20)
+    ax4.set_title("Remarkable Error ($e>0.2$, $n_{{R}}={0:d}$) Distribution".format(len(data_error_remarkable)), fontsize=20)
 
 
 
@@ -145,13 +153,13 @@ def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None):
     data_prediction = []
     data_error = []
     data_error_remarkable = []
-    for one_line in lines[:50]:
+    for one_line in lines[:]:
         parts = one_line.split(",")
         data_truth.append((float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])))
         data_prediction.append((float(parts[1]), float(parts[2]), float(parts[3]), float(parts[5])))
         one_error = abs((float(parts[5]) - float(parts[4])) / float(parts[4]))
         data_error.append((float(parts[1]), float(parts[2]), float(parts[3]), one_error))
-        if one_error > 0.1:
+        if one_error > 0.2:
             data_error_remarkable.append((float(parts[1]), float(parts[2]), float(parts[3]), one_error))
     # print("data_truth:")
     # print(data_truth)
@@ -163,10 +171,18 @@ def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None):
     data_prediction = np.asarray(data_prediction)
     data_error = np.asarray(data_error)
     draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkable, save_path, title)
+    print(f"saved \"{title}\" to {save_path}")
 
 
 if __name__ == "__main__":
     # a = np.asarray([1.0, 2.0, 3.0])
     # a = torch.tensor([1.0, 2.0, 3.0])
     # print(my_min_max(a))
-    one_time_draw_3d_points_from_txt("test/output_20230603_044523_387666_best_train.txt", "test/comparison.png", title="Results of the Test Set Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_best_train.txt", "test/comparison_best_train.png", title="Results of the Train Set (n=28944) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_best_val.txt", "test/comparison_best_test.png", title="Results of the Test Set (n=7237) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_last_train.txt", "test/comparison_last_train.png", title="Results of the Train Set (n=28944) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_last_val.txt", "test/comparison_last_test.png", title="Results of the Test Set (n=7237) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    # a = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
+    # a = np.asarray(a)
+    # np.random.shuffle(a)
+    # print(a)
