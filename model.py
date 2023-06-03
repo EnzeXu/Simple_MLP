@@ -25,18 +25,19 @@ class MyModel(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(self.x_dim, 128, dtype=torch.float64),
             nn.Dropout(0.2),
-            nn.BatchNorm1d(128),
+            nn.BatchNorm1d(128, dtype=torch.float64),
             nn.ReLU(),
-            nn.Linear(128, 128, dtype=torch.float64),
+            nn.Linear(128, 256, dtype=torch.float64),
             nn.Dropout(0.2),
-            nn.BatchNorm1d(128),
+            nn.BatchNorm1d(256, dtype=torch.float64),
             nn.ReLU(),
             # nn.Linear(256, 256),  #
             # nn.BatchNorm1d(256),  #
             # nn.ReLU(),  #
-            # nn.Linear(256, 128),
-            # nn.BatchNorm1d(128),
-            # nn.ReLU(),
+            nn.Linear(256, 128, dtype=torch.float64),
+            nn.Dropout(0.2),
+            nn.BatchNorm1d(128, dtype=torch.float64),
+            nn.ReLU(),
             nn.Linear(128, self.y_dim, dtype=torch.float64),
         )
         # print("{} layers".format(len(self.fc)))
