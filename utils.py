@@ -140,7 +140,7 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
         fig.suptitle(title, fontsize=20)
     plt.tight_layout()
     # plt.subplots_adjust(right=0.8)
-    plt.savefig(save_path, dpi=400)
+    plt.savefig(save_path, dpi=300)
     plt.close()
     print("max", np.max(data_error[:, -1]))
     print("min", np.min(data_error[:, -1]))
@@ -205,18 +205,18 @@ def plot_value_distribution(data, save_path):
                     xytext=(0, 3), textcoords='offset points',
                     ha='center', va='bottom')
 
-    plt.savefig(save_path, dpi=400)
+    plt.savefig(save_path, dpi=300)
     plt.close()
 
 if __name__ == "__main__":
     # a = np.asarray([1.0, 2.0, 3.0])
     # a = torch.tensor([1.0, 2.0, 3.0])
     # print(my_min_max(a))
-    timestring = "20230603_044727_785177"
+    timestring = "20230603_063106_059898"#"20230603_044727_785177"
     one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_train.txt", f"test/comparison_{timestring}_best_train.png", title="Results of the Train Set (n=28944) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_val.txt", f"test/comparison_{timestring}_best_test.png", title="Results of the Test Set (n=7237) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt", f"test/comparison_{timestring}_last_train.png", title="Results of the Train Set (n=28944) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt", f"test/comparison_{timestring}_last_test.png", title="Results of the Test Set (n=7237) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_val.txt", f"test/comparison_{timestring}_best_test.png", title="Results of the Test Set (n=7237) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt", f"test/comparison_{timestring}_last_train.png", title="Results of the Train Set (n=28944) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt", f"test/comparison_{timestring}_last_test.png", title="Results of the Test Set (n=7237) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
     # a = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
     # a = np.asarray(a)
     # np.random.shuffle(a)

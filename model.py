@@ -31,9 +31,6 @@ class MyModel(nn.Module):
             nn.Dropout(0.2),
             nn.BatchNorm1d(256, dtype=torch.float64),
             nn.ReLU(),
-            # nn.Linear(256, 256),  #
-            # nn.BatchNorm1d(256),  #
-            # nn.ReLU(),  #
             nn.Linear(256, 128, dtype=torch.float64),
             nn.Dropout(0.2),
             nn.BatchNorm1d(128, dtype=torch.float64),
@@ -350,6 +347,7 @@ if __name__ == "__main__":
     print("using {}".format(device))
 
     model = MyModel(x_dim=dataset.x_dim, y_dim=dataset.y_dim).to(device)
+    print(model)
     # model.load_state_dict(torch.load(main_path + "saves/model_20230228_211049_069082.pt"))
     epochs = 1000
     criterion = nn.MSELoss()  #  relative_loss  # nn.MSELoss()
