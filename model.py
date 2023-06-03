@@ -120,11 +120,12 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
 
             # print("model saved to {}".format(main_path + "saves/model_{}.pt".format(timestring)))
         if epoch % 50 == 0 or epoch == epochs:
+            torch.save(model.state_dict(), main_path + "saves/model_{}_last.pt".format(record_timestring_start))
             generate_output(main_path + "saves/model_{}_best.pt".format(record_timestring_start),
                             record_timestring_start, device, "best")
             generate_output(main_path + "saves/model_{}_last.pt".format(record_timestring_start),
                             record_timestring_start, device, "last")
-            torch.save(model.state_dict(), main_path + "saves/model_{}_last.pt".format(record_timestring_start))
+
 
         scheduler.step()
         # if (epoch + 1) % 10 == 0:
