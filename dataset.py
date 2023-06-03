@@ -20,8 +20,8 @@ class MyDataset(Dataset):
         print(f"loading data from {path} ...")
         df = pd.read_csv(path, header=None)
 
-        self.x_data = torch.tensor(df.values, dtype=torch.float32)[:, :3]
-        self.y_data = torch.tensor(df.values, dtype=torch.float32)[:, 3:4]
+        self.x_data = torch.tensor(df.values, dtype=torch.float64)[:, :3]
+        self.y_data = torch.tensor(df.values, dtype=torch.float64)[:, 3:4]
         self.x_data[:, 0:1], x1_min, x1_max = my_min_max(self.x_data[:, 0:1])
         self.x_data[:, 1:2], x2_min, x2_max = my_min_max(self.x_data[:, 1:2])
         self.x_data[:, 2:3], x3_min, x3_max = my_min_max(self.x_data[:, 2:3])

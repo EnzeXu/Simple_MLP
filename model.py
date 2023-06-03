@@ -49,7 +49,7 @@ def train(model, dataloader, criterion, optimizer, device):
     model.train()
     running_loss = 0.0
     for inputs, labels in dataloader:  # tqdm(dataloader, total=len(dataloader)):
-        inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
+        inputs, labels = inputs.to(dtype=torch.float64).to(device), labels.to(dtype=torch.float64).to(device)
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, labels)
@@ -64,7 +64,7 @@ def validate(model, dataloader, criterion, device):
     running_loss = 0.0
     with torch.no_grad():
         for inputs, labels in dataloader:
-            inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
+            inputs, labels = inputs.to(dtype=torch.float64).to(device), labels.to(dtype=torch.float64).to(device)
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             running_loss += loss.item()
@@ -76,7 +76,7 @@ def validate(model, dataloader, criterion, device):
 #     running_loss = 0.0
 #     with torch.no_grad():
 #         for inputs, labels in dataloader:
-#             inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
+#             inputs, labels = inputs.to(dtype=torch.float64).to(device), labels.to(dtype=torch.float64).to(device)
 #             output = model(inputs)
 #             loss = criterion(output, labels)
 #             running_loss += loss.item()
@@ -168,7 +168,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
         row_id = 0
         with torch.no_grad():
             for inputs, labels in val_loader:
-                inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
+                inputs, labels = inputs.to(dtype=torch.float64).to(device), labels.to(dtype=torch.float64).to(device)
                 outputs = model(inputs)
                 labels = labels.cpu().detach().numpy()
                 outputs = outputs.cpu().detach().numpy()
@@ -262,7 +262,7 @@ def generate_output(pt_path, timestring=None, device=None, pt_type="test"):
         sorted_output_val = []
         with torch.no_grad():
             for inputs, labels in val_loader:
-                inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
+                inputs, labels = inputs.to(dtype=torch.float64).to(device), labels.to(dtype=torch.float64).to(device)
                 outputs = model(inputs)
                 inputs = inputs.cpu().detach().numpy()
                 labels = labels.cpu().detach().numpy()
@@ -297,7 +297,7 @@ def generate_output(pt_path, timestring=None, device=None, pt_type="test"):
         sorted_output_train = []
         with torch.no_grad():
             for inputs, labels in train_loader:
-                inputs, labels = inputs.to(dtype=torch.float32).to(device), labels.to(dtype=torch.float32).to(device)
+                inputs, labels = inputs.to(dtype=torch.float64).to(device), labels.to(dtype=torch.float64).to(device)
                 outputs = model(inputs)
                 inputs = inputs.cpu().detach().numpy()
                 labels = labels.cpu().detach().numpy()
@@ -352,7 +352,7 @@ if __name__ == "__main__":
     # model.load_state_dict(torch.load(main_path + "saves/model_20230228_211049_069082.pt"))
     epochs = 1000
     criterion = nn.MSELoss()  #  relative_loss  # nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.1)
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda e: 1 / (e / (0.01 * epochs) + 1))
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200, eta_min=0.000001 * 0.1)
 

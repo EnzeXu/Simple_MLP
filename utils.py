@@ -131,7 +131,7 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     ax4.tick_params(axis='x', labelsize=10)
     ax4.tick_params(axis='y', labelsize=10)
     ax4.tick_params(axis='z', labelsize=10)
-    ax4.set_title("Remarkable Error ($e>0.2$, $n_{{R}}={0:d}$) Distribution".format(len(data_error_remarkable)), fontsize=20)
+    ax4.set_title("Remarkable Error ($e>0.1$, $n_{{R}}={0:d}$) Distribution".format(len(data_error_remarkable)), fontsize=20)  # , len(data_error_remarkable) / len(data_error) * 100.0
 
 
 
@@ -159,7 +159,7 @@ def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None):
         data_prediction.append((float(parts[1]), float(parts[2]), float(parts[3]), float(parts[5])))
         one_error = abs((float(parts[5]) - float(parts[4])) / float(parts[4]))
         data_error.append((float(parts[1]), float(parts[2]), float(parts[3]), one_error))
-        if one_error > 0.2:
+        if one_error > 0.1:
             data_error_remarkable.append((float(parts[1]), float(parts[2]), float(parts[3]), one_error))
     # print("data_truth:")
     # print(data_truth)
@@ -178,10 +178,10 @@ if __name__ == "__main__":
     # a = np.asarray([1.0, 2.0, 3.0])
     # a = torch.tensor([1.0, 2.0, 3.0])
     # print(my_min_max(a))
-    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_best_train.txt", "test/comparison_best_train.png", title="Results of the Train Set (n=28944) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_best_val.txt", "test/comparison_best_test.png", title="Results of the Test Set (n=7237) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_last_train.txt", "test/comparison_last_train.png", title="Results of the Train Set (n=28944) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_last_val.txt", "test/comparison_last_test.png", title="Results of the Test Set (n=7237) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_best_train.txt", "test/comparison_20230603_044727_785177_best_train.png", title="Results of the Train Set (n=28944) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_best_val.txt", "test/comparison_20230603_044727_785177_best_test.png", title="Results of the Test Set (n=7237) Using best.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_last_train.txt", "test/comparison_20230603_044727_785177_last_train.png", title="Results of the Train Set (n=28944) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt("record/output/output_20230603_044727_785177_last_val.txt", "test/comparison_20230603_044727_785177_last_test.png", title="Results of the Test Set (n=7237) Using last.pt [dataset=k_hyz_k_pyx_k_smzx]")
     # a = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
     # a = np.asarray(a)
     # np.random.shuffle(a)
