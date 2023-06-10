@@ -242,7 +242,7 @@ def generate_output(pt_path, opt, timestring=None, device=None, pt_type="test"):
 
     with open(f"processed/filter={opt.filter}/record_min_max.pkl", "rb") as f:
         record = pickle.load(f)
-        record = pickle.load(f)
+
     x1_min = record["x1_min"]
     x1_max = record["x1_max"]
     x2_min = record["x2_min"]
