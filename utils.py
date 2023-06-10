@@ -237,6 +237,7 @@ def one_time_filter_data(data_path, filter_list):
             c1, c2, c3 = parts[3], parts[4], parts[5]
             if c1 == c2 == c3 == "inf":
                 count_inf += 1
+                f_write.write(one_line)
             elif c1 == "inf" or c2 == "inf" or c3 == "inf":
                 count_bad += 1
             else:
