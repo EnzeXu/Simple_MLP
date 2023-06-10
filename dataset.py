@@ -53,7 +53,7 @@ class MyDataset(Dataset):
 
 def one_time_generate_dataset():
     t0 = time.time()
-    dataset = MyDataset("data/dataset_osci_0_1_2.csv")
+    dataset = MyDataset("data/dataset_osci_0_1_2_v0604.csv")
 
     print(dataset.x_data[0], dataset.y_data[0])
 
