@@ -6,6 +6,7 @@ import pickle
 import torch
 import pandas as pd
 import os
+import math
 from torch.utils.data import Dataset, DataLoader
 
 import matplotlib.pyplot as plt
@@ -146,7 +147,7 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     print("min", np.min(data_error[:, -1]))
     plot_value_distribution(data_error[:, -1], save_path=save_path.replace(".png", "_distribution.png"))
 
-def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None):
+def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None, log_flag=False):
     with open(txt_path, "r") as f:
         lines = f.readlines()
     lines = [line for line in lines if "," in line and "x" not in line]
@@ -156,6 +157,10 @@ def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None):
     data_error_remarkable = []
     for one_line in lines[:]:
         parts = one_line.split(",")
+        if log_flag:
+            parts[1] = np.log(float(parts[1]))
+            parts[2] = np.log(float(parts[2]))
+            parts[3] = np.log(float(parts[3]))
         data_truth.append((float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])))
         data_prediction.append((float(parts[1]), float(parts[2]), float(parts[3]), float(parts[5])))
         one_error = abs((float(parts[5]) - float(parts[4])) / float(parts[4]))
@@ -213,10 +218,10 @@ if __name__ == "__main__":
     # a = torch.tensor([1.0, 2.0, 3.0])
     # print(my_min_max(a))
     timestring = "20230603_063106_059898"#"20230603_044727_785177"
-    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_train.txt", f"test/comparison_{timestring}_best_train.png", title="Results of the Train Set (n=28944) [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_val.txt", f"test/comparison_{timestring}_best_test.png", title="Results of the Test Set (n=7237) [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt", f"test/comparison_{timestring}_last_train.png", title="Results of the Train Set (n=28944) [dataset=k_hyz_k_pyx_k_smzx]")
-    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt", f"test/comparison_{timestring}_last_test.png", title="Results of the Test Set (n=7237) [dataset=k_hyz_k_pyx_k_smzx]")
+    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_train.txt", f"test/comparison_{timestring}_best_train_log.png", title="Results of the Train Set (n=28944) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
+    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_val.txt", f"test/comparison_{timestring}_best_test_log.png", title="Results of the Test Set (n=7237) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
+    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt", f"test/comparison_{timestring}_last_train_log.png", title="Results of the Train Set (n=28944) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
+    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt", f"test/comparison_{timestring}_last_test_log.png", title="Results of the Test Set (n=7237) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
     # a = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
     # a = np.asarray(a)
     # np.random.shuffle(a)
