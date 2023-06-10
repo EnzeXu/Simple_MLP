@@ -213,16 +213,60 @@ def plot_value_distribution(data, save_path):
     plt.savefig(save_path, dpi=300)
     plt.close()
 
+
+def one_time_filter_data(data_path, filter_list):
+    with open(data_path, "r") as f:
+        lines = f.readlines()
+    lines = [line for line in lines if len(line) > 10 and "k_" not in line]
+    print(f"Initial: all {len(lines)} lines")
+
+    for one_filter in filter_list:
+        save_path = data_path.replace(".csv", f"_{'all' if one_filter > 1000 else one_filter}.csv")
+        # with open(save_path, "w") as f_tmp:
+        #     pass
+        f_write = open(save_path, "w")
+
+        count_inf = 0
+        count_normal = 0
+        count_normal_remain = 0
+        count_bad = 0
+
+        print(f"# filter: <{one_filter} or inf")
+        for one_line in lines:
+            parts = one_line.split(",")
+            c1, c2, c3 = parts[3], parts[4], parts[5]
+            if c1 == c2 == c3 == "inf":
+                count_inf += 1
+            elif c1 == "inf" or c2 == "inf" or c3 == "inf":
+                count_bad += 1
+            else:
+                c1_f, c2_f, c3_f = float(c1), float(c2), float(c3)
+                if max(c1_f, c2_f, c3_f) - min(c1_f, c2_f, c3_f) > 5:
+                    count_bad += 1
+                else:
+                    count_normal += 1
+                    if c1_f < one_filter:
+                        count_normal_remain += 1
+                        f_write.write(one_line)
+        f_write.close()
+        print(f"count_inf: {count_inf}")
+        print(f"count_normal: {count_normal} ({count_normal_remain} remain for matching \"<{one_filter}\"))")
+        print(f"count_bad: {count_bad}")
+
+
 if __name__ == "__main__":
     # a = np.asarray([1.0, 2.0, 3.0])
     # a = torch.tensor([1.0, 2.0, 3.0])
     # print(my_min_max(a))
-    timestring = "20230603_063106_059898"#"20230603_044727_785177"
-    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_train.txt", f"test/comparison_{timestring}_best_train_log.png", title="Results of the Train Set (n=28944) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
-    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_val.txt", f"test/comparison_{timestring}_best_test_log.png", title="Results of the Test Set (n=7237) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
-    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt", f"test/comparison_{timestring}_last_train_log.png", title="Results of the Train Set (n=28944) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
-    one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt", f"test/comparison_{timestring}_last_test_log.png", title="Results of the Test Set (n=7237) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
+
+    # timestring = "20230603_063106_059898"#"20230603_044727_785177"
+    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_train.txt", f"test/comparison_{timestring}_best_train_log.png", title="Results of the Train Set (n=28944) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
+    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_best_val.txt", f"test/comparison_{timestring}_best_test_log.png", title="Results of the Test Set (n=7237) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
+    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt", f"test/comparison_{timestring}_last_train_log.png", title="Results of the Train Set (n=28944) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
+    # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt", f"test/comparison_{timestring}_last_test_log.png", title="Results of the Test Set (n=7237) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=True)
+
     # a = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
     # a = np.asarray(a)
     # np.random.shuffle(a)
     # print(a)
+    one_time_filter_data("data/dataset_osci_0_1_2_v0604.csv", [999999, 200, 100])

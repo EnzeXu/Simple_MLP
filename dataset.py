@@ -2,6 +2,7 @@ from torch.utils.data import Dataset, DataLoader
 # from const import *
 # from sklearn.preprocessing import MinMaxScaler
 import numpy as np
+import os
 import pandas as pd
 
 import pickle
@@ -16,7 +17,7 @@ from sklearn.model_selection import train_test_split
 from utils import my_min_max, decode
 
 class MyDataset(Dataset):
-    def __init__(self, path):
+    def __init__(self, path, filter):
         print(f"loading data from {path} ...")
         df = pd.read_csv(path, header=None)
 
@@ -35,7 +36,7 @@ class MyDataset(Dataset):
         record["x3_max"] = x3_max
         record["y_min"] = y_min
         record["y_max"] = y_max
-        with open("processed/record_min_max.pkl", "wb") as f:
+        with open(f"processed/filter={filter}/record_min_max.pkl", "wb") as f:
             pickle.dump(record, f)
         self.x_dim = self.x_data.shape[-1]
         self.y_dim = self.y_data.shape[-1]
@@ -51,9 +52,43 @@ class MyDataset(Dataset):
         return x, y
 
 
-def one_time_generate_dataset():
+# def one_time_generate_dataset():
+#     t0 = time.time()
+#     dataset = MyDataset("data/dataset_osci_0_1_2_v0604.csv")
+#
+#     print(dataset.x_data[0], dataset.y_data[0])
+#
+#     # train_idxs, val_idxs, test_idxs = train_test_split(np.arange(len(dataset)), test_size=0.2, random_state=0)
+#     train_idxs, val_idxs = train_test_split(np.arange(len(dataset)), test_size=0.2, random_state=42)
+#     print(len(train_idxs), len(val_idxs))
+#     train_dataset = torch.utils.data.Subset(dataset, train_idxs)
+#     val_dataset = torch.utils.data.Subset(dataset, val_idxs)
+#     with open("processed/train_idx.pkl", "wb") as f:
+#         pickle.dump(train_idxs, f)
+#     with open("processed/val_idx.pkl", "wb") as f:
+#         pickle.dump(val_idxs, f)
+#
+#     with open("processed/x_raw.pkl", "wb") as f:
+#         pickle.dump(dataset.x_data, f)
+#     with open("processed/y_raw.pkl", "wb") as f:
+#         pickle.dump(dataset.y_data, f)
+#
+#     with open("processed/all.pkl", "wb") as f:
+#         pickle.dump(dataset, f)
+#     with open("processed/train.pkl", "wb") as f:
+#         pickle.dump(train_dataset, f)
+#     with open("processed/valid.pkl", "wb") as f:
+#         pickle.dump(val_dataset, f)
+#     print("cost {0:.6f} min".format((time.time() - t0) / 60.0))
+
+def one_time_generate_dataset(source_path, filter):
     t0 = time.time()
-    dataset = MyDataset("data/dataset_osci_0_1_2_v0604.csv")
+    source_path = source_path.replace(".csv", f"_{filter}.csv")
+    save_folder_path = f"processed/filter={filter}/"
+    if not os.path.exists(save_folder_path):
+        os.makedirs(save_folder_path)
+    dataset = MyDataset(source_path, filter)
+
 
     print(dataset.x_data[0], dataset.y_data[0])
 
@@ -62,24 +97,27 @@ def one_time_generate_dataset():
     print(len(train_idxs), len(val_idxs))
     train_dataset = torch.utils.data.Subset(dataset, train_idxs)
     val_dataset = torch.utils.data.Subset(dataset, val_idxs)
-    with open("processed/train_idx.pkl", "wb") as f:
+    with open(save_folder_path + "train_idx.pkl", "wb") as f:
         pickle.dump(train_idxs, f)
-    with open("processed/val_idx.pkl", "wb") as f:
+    with open(save_folder_path + "val_idx.pkl", "wb") as f:
         pickle.dump(val_idxs, f)
 
-    with open("processed/x_raw.pkl", "wb") as f:
+    with open(save_folder_path + "x_raw.pkl", "wb") as f:
         pickle.dump(dataset.x_data, f)
-    with open("processed/y_raw.pkl", "wb") as f:
+    with open(save_folder_path + "y_raw.pkl", "wb") as f:
         pickle.dump(dataset.y_data, f)
 
-    with open("processed/all.pkl", "wb") as f:
+    with open(save_folder_path + "all.pkl", "wb") as f:
         pickle.dump(dataset, f)
-    with open("processed/train.pkl", "wb") as f:
+    with open(save_folder_path + "train.pkl", "wb") as f:
         pickle.dump(train_dataset, f)
-    with open("processed/valid.pkl", "wb") as f:
+    with open(save_folder_path + "valid.pkl", "wb") as f:
         pickle.dump(val_dataset, f)
+    print(f"saved to {save_folder_path}")
     print("cost {0:.6f} min".format((time.time() - t0) / 60.0))
 
 
 if __name__ == "__main__":
-    one_time_generate_dataset()
+    one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "all")
+    one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "200")
+    one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "100")
