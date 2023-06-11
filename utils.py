@@ -369,12 +369,12 @@ if __name__ == "__main__":
     # a = np.asarray(a)
     # np.random.shuffle(a)
     # print(a)
-    # one_time_filter_data("data/dataset_osci_0_1_2_v0604.csv", [999999, 200, 100])
+    one_time_filter_data("data/dataset_osci_3_4_5_v0604.csv", [999999, 200, 100])
 
-    for timestring in ["20230610_181925_338004", "20230610_181927_659788", "20230610_181931_660269"]:
-        # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt",
-        #                                  f"test/comparison_{timestring}_last_train.png",
-        #                                  title="Results of the Train Set (n={}) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=False)
-        one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt",
-                                         f"test/comparison_{timestring}_last_test.png",
-                                         title="Results of the Test Set (n={}) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=False)
+    # for timestring in ["20230610_181925_338004", "20230610_181927_659788", "20230610_181931_660269"]:
+    #     # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt",
+    #     #                                  f"test/comparison_{timestring}_last_train.png",
+    #     #                                  title="Results of the Train Set (n={}) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=False)
+    #     one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt",
+    #                                      f"test/comparison_{timestring}_last_test.png",
+    #                                      title="Results of the Test Set (n={}) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=False)
