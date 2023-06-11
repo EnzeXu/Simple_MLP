@@ -101,10 +101,10 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     z = [point[2] for point in data_error]
     val = [point[3] for point in data_error]
 
-    cmap = 'coolwarm'
+    cmap = 'cool'
 
     scatter = ax3.scatter(x, y, z, c=val, cmap=cmap, alpha=0.4)
-    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=error_y_min, vmax=error_y_max)), ax=ax3, shrink=0.5)
+    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=error_y_min, vmax=0.05)), ax=ax3, shrink=0.5)
 
     ax3.set_xlabel(x_label)
     ax3.set_ylabel(y_label)
@@ -120,10 +120,10 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     z = [point[2] for point in data_error_remarkable]
     val = [point[3] for point in data_error_remarkable]
 
-    cmap = 'coolwarm'
+    cmap = 'cool'
 
     scatter = ax4.scatter(x, y, z, c=val, cmap=cmap, alpha=0.4)
-    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=error_y_min, vmax=error_y_max)), ax=ax4,
+    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=error_y_min, vmax=0.05)), ax=ax4,
                             shrink=0.5)
 
     ax4.set_xlabel(x_label)
@@ -132,7 +132,7 @@ def draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkabl
     ax4.tick_params(axis='x', labelsize=10)
     ax4.tick_params(axis='y', labelsize=10)
     ax4.tick_params(axis='z', labelsize=10)
-    ax4.set_title("Remarkable Error ($e>0.1$, $n_{{R}}={0:d}$) Distribution".format(len(data_error_remarkable)), fontsize=20)  # , len(data_error_remarkable) / len(data_error) * 100.0
+    ax4.set_title("Remarkable Error ($e>0.05$, $n_{{R}}={0:d}$) Distribution".format(len(data_error_remarkable)), fontsize=20)  # , len(data_error_remarkable) / len(data_error) * 100.0
 
     #remarkable
 
@@ -155,6 +155,9 @@ def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None, log_flag=F
     data_prediction = []
     data_error = []
     data_error_remarkable = []
+    # data_2D_error = []
+    # data_2D_truth = []
+    error_sum = 0.0
     for one_line in lines[:]:
         parts = one_line.split(",")
         if log_flag:
@@ -162,10 +165,12 @@ def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None, log_flag=F
             parts[2] = np.log(float(parts[2]))
             parts[3] = np.log(float(parts[3]))
         data_truth.append((float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])))
+
         data_prediction.append((float(parts[1]), float(parts[2]), float(parts[3]), float(parts[5])))
         one_error = abs((float(parts[5]) - float(parts[4])) / float(parts[4]))
+        error_sum += one_error
         data_error.append((float(parts[1]), float(parts[2]), float(parts[3]), one_error))
-        if one_error > 0.1:
+        if one_error > 0.05:
             data_error_remarkable.append((float(parts[1]), float(parts[2]), float(parts[3]), one_error))
     # print("data_truth:")
     # print(data_truth)
@@ -173,16 +178,21 @@ def one_time_draw_3d_points_from_txt(txt_path, save_path, title=None, log_flag=F
     # print(data_prediction)
     # print("data_error:")
     # print(data_error)
+
+    print(f"## Average Error: {error_sum:.6f} / {len(lines)} = {error_sum / len(lines):.12f}")
+
+    draw_3_2d_points(data_error, data_truth, save_path.replace(".png", "_2D.png"))
+
     data_truth = np.asarray(data_truth)
     data_prediction = np.asarray(data_prediction)
     data_error = np.asarray(data_error)
-    draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkable, save_path, title)
+    draw_3d_points(data_truth, data_prediction, data_error, data_error_remarkable, save_path, title.format(len(lines)))
     print(f"saved \"{title}\" to {save_path}")
 
 
 def plot_value_distribution(data, save_path):
-    fig = plt.figure(figsize=(24, 6))
-    bin_edges = np.arange(0.0, 2.0, 0.05)
+    fig = plt.figure(figsize=(12, 6))
+    bin_edges = np.arange(0.0, 1.0, 0.05)
 
     # Calculate the histogram of the data using the defined bins
     hist, _ = np.histogram(data, bins=bin_edges)
@@ -200,7 +210,7 @@ def plot_value_distribution(data, save_path):
     ax.set_title('Error Distribution')
 
     # Set x-axis ticks to match the desired range [0.1, 0.2, ..., 0.9, 1.0]
-    x_ticks = np.arange(0.0, 2.0, 0.05)
+    x_ticks = np.arange(0.0, 1.0, 0.05)
     plt.xticks(x_ticks)
 
     # Add count labels on top of each bar
@@ -255,6 +265,95 @@ def one_time_filter_data(data_path, filter_list):
         print(f"count_bad: {count_bad}")
 
 
+def draw_3_2d_points(data_error, data_truth, save_path):
+    fig, axes = plt.subplots(2, 3, figsize=(24, 14))
+
+    x_label = "k_hyz"
+    y_label = "k_pyx"
+    z_label = "k_smzx"
+
+    x_error = np.array([item[0] for item in data_error])
+    y_error = np.array([item[1] for item in data_error])
+    z_error = np.array([item[2] for item in data_error])
+    value_error = np.array([item[3] for item in data_error])
+
+    x_truth = np.array([item[0] for item in data_truth])
+    y_truth = np.array([item[1] for item in data_truth])
+    z_truth = np.array([item[2] for item in data_truth])
+    value_truth = np.array([item[3] for item in data_truth])
+
+    point_size = 15
+    alpha_level = 0.5
+
+    cmap = "cool"
+
+    ax = axes[0][0]
+    sc = ax.scatter(x_error, y_error, c=value_error, alpha=alpha_level, s=point_size, cmap=cmap)
+    ax.set_xlabel(x_label, fontsize=20)
+    ax.set_ylabel(y_label, fontsize=20)
+    ax.tick_params(axis='x', labelsize=10)
+    ax.tick_params(axis='y', labelsize=10)
+    ax.set_title('2D-XY: Error Rate of Circle Time', fontsize=20)
+    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=min(value_error), vmax=0.05)),
+                            ax=ax, shrink=0.5)
+
+    ax = axes[0][1]
+    sc = ax.scatter(x_error, z_error, c=value_error, alpha=alpha_level, s=point_size, cmap=cmap)
+    ax.set_xlabel(x_label, fontsize=20)
+    ax.set_ylabel(z_label, fontsize=20)
+    ax.tick_params(axis='x', labelsize=10)
+    ax.tick_params(axis='y', labelsize=10)
+    ax.set_title('2D-XZ: Error Rate of Circle Time', fontsize=20)
+    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=min(value_error), vmax=0.05)),
+                            ax=ax, shrink=0.5)
+
+    ax = axes[0][2]
+    sc = ax.scatter(y_error, z_error, c=value_error, alpha=alpha_level, s=point_size, cmap=cmap)
+    ax.set_xlabel(y_label, fontsize=20)
+    ax.set_ylabel(z_label, fontsize=20)
+    ax.tick_params(axis='x', labelsize=10)
+    ax.tick_params(axis='y', labelsize=10)
+    ax.set_title('2D-YZ: Error Rate of Circle Time', fontsize=20)
+    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=min(value_error), vmax=0.05)),
+                            ax=ax, shrink=0.5)
+
+    cmap = "hot"
+
+    ax = axes[1][0]
+    sc = ax.scatter(x_truth, y_truth, c=value_truth, alpha=alpha_level, s=point_size, cmap=cmap)
+    ax.set_xlabel(x_label, fontsize=20)
+    ax.set_ylabel(y_label, fontsize=20)
+    ax.tick_params(axis='x', labelsize=10)
+    ax.tick_params(axis='y', labelsize=10)
+    ax.set_title('2D-XY: Truth of Circle Time', fontsize=20)
+    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=min(value_truth), vmax=max(value_truth))),
+                            ax=ax, shrink=0.5)
+
+    ax = axes[1][1]
+    sc = ax.scatter(x_truth, z_truth, c=value_truth, alpha=alpha_level, s=point_size, cmap=cmap)
+    ax.set_xlabel(x_label, fontsize=20)
+    ax.set_ylabel(z_label, fontsize=20)
+    ax.tick_params(axis='x', labelsize=10)
+    ax.tick_params(axis='y', labelsize=10)
+    ax.set_title('2D-XZ: Truth of Circle Time', fontsize=20)
+    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=min(value_truth), vmax=max(value_truth))),
+                            ax=ax, shrink=0.5)
+
+    ax = axes[1][2]
+    sc = ax.scatter(y_truth, z_truth, c=value_truth, alpha=alpha_level, s=point_size, cmap=cmap)
+    ax.set_xlabel(y_label, fontsize=20)
+    ax.set_ylabel(z_label, fontsize=20)
+    ax.tick_params(axis='x', labelsize=10)
+    ax.tick_params(axis='y', labelsize=10)
+    ax.set_title('2D-YZ: Truth of Circle Time', fontsize=20)
+    colorbar = plt.colorbar(ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=min(value_truth), vmax=max(value_truth))),
+                            ax=ax, shrink=0.5)
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300)
+    plt.close()
+
+
 if __name__ == "__main__":
     # a = np.asarray([1.0, 2.0, 3.0])
     # a = torch.tensor([1.0, 2.0, 3.0])
@@ -270,4 +369,12 @@ if __name__ == "__main__":
     # a = np.asarray(a)
     # np.random.shuffle(a)
     # print(a)
-    one_time_filter_data("data/dataset_osci_0_1_2_v0604.csv", [999999, 200, 100])
+    # one_time_filter_data("data/dataset_osci_0_1_2_v0604.csv", [999999, 200, 100])
+
+    for timestring in ["20230610_181925_338004", "20230610_181927_659788", "20230610_181931_660269"]:
+        # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt",
+        #                                  f"test/comparison_{timestring}_last_train.png",
+        #                                  title="Results of the Train Set (n={}) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=False)
+        one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_val.txt",
+                                         f"test/comparison_{timestring}_last_test.png",
+                                         title="Results of the Test Set (n={}) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=False)
