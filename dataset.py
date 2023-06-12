@@ -118,6 +118,10 @@ def one_time_generate_dataset(source_path, filter):
 
 
 if __name__ == "__main__":
-    one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "all")
-    one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "200")
-    one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "100")
+    # one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "all")
+    # one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "200")
+    # one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "100")
+
+    one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "all")
+    one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "200")
+    one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "100")
