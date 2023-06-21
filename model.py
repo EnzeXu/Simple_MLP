@@ -127,7 +127,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                             record_timestring_start, device, "last")
 
 
-        scheduler.step()
+        # scheduler.step()
         # if (epoch + 1) % 10 == 0:
         #     plt.figure(figsize=(16, 9))
         #     plt.plot(range(1, len(train_loss_record) + 1), train_loss_record, label="train loss")
