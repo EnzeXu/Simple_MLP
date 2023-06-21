@@ -247,13 +247,16 @@ def generate_output(pt_path, opt, timestring=None, device=None, pt_type="test"):
     x1_max = record["x1_max"]
     x2_min = record["x2_min"]
     x2_max = record["x2_max"]
-    x3_min = record["x3_min"]
-    x3_max = record["x3_max"]
+    assert opt.input_n in [2, 3]
+
     y_min = record["y_min"]
     y_max = record["y_max"]
     x_data_raw[:, 0:1] = decode(x_data_raw[:, 0:1], x1_min, x1_max)
     x_data_raw[:, 1:2] = decode(x_data_raw[:, 1:2], x2_min, x2_max)
-    x_data_raw[:, 2:3] = decode(x_data_raw[:, 2:3], x3_min, x3_max)
+    if opt.input_n == 3:
+        x3_min = record["x3_min"]
+        x3_max = record["x3_max"]
+        x_data_raw[:, 2:3] = decode(x_data_raw[:, 2:3], x3_min, x3_max)
     y_data_raw[:, :] = decode(y_data_raw[:, :], y_min, y_max)
 
     with open(save_output_path_val, "w") as f:
@@ -272,7 +275,7 @@ def generate_output(pt_path, opt, timestring=None, device=None, pt_type="test"):
 
                 for i in range(len(inputs)):
                     sorted_output_val.append(
-                        [val_idx[row_id],
+                        [int(val_idx[row_id]),
                         ",".join([str("{0:.12f}".format(item)) for item in x_data_raw[val_idx[row_id]]]),
                         ",".join([str("{0:.12f}".format(item)) for item in y_data_raw[val_idx[row_id]]]),
                         ",".join([str("{0:.12f}".format(item)) for item in outputs[i]])]
@@ -283,11 +286,8 @@ def generate_output(pt_path, opt, timestring=None, device=None, pt_type="test"):
         for one_output in sorted_output_val:
             # print("[model] input: {} / labels: {} / output: {}".format(str(list(inputs[i])), str(list(labels[i])), str(list(outputs[i]))))
             # print("[original] x: {} / y: {} ".format(str(list(x_data_raw[val_idx[row_id]])), str(list(y_data_raw[val_idx[row_id]]))))
-            f.write("{0:d},{1},{2},{3}\n".format(
-                one_output[0],
-                one_output[1],
-                one_output[2],
-                one_output[3],
+            f.write("{0}\n".format(
+                ",".join([str(item) for item in one_output])
             ))
     print("saved val output to {}".format(save_output_path_val))
 
@@ -307,7 +307,7 @@ def generate_output(pt_path, opt, timestring=None, device=None, pt_type="test"):
 
                 for i in range(len(inputs)):
                     sorted_output_train.append(
-                        [train_idx[row_id],
+                        [int(train_idx[row_id]),
                         ",".join([str("{0:.12f}".format(item)) for item in x_data_raw[train_idx[row_id]]]),
                         ",".join([str("{0:.12f}".format(item)) for item in y_data_raw[train_idx[row_id]]]),
                         ",".join([str("{0:.12f}".format(item)) for item in outputs[i]])]
@@ -318,11 +318,8 @@ def generate_output(pt_path, opt, timestring=None, device=None, pt_type="test"):
         for one_output in sorted_output_train:
             # print("[model] input: {} / labels: {} / output: {}".format(str(list(inputs[i])), str(list(labels[i])), str(list(outputs[i]))))
             # print("[original] x: {} / y: {} ".format(str(list(x_data_raw[val_idx[row_id]])), str(list(y_data_raw[val_idx[row_id]]))))
-            f.write("{0:d},{1},{2},{3}\n".format(
-                one_output[0],
-                one_output[1],
-                one_output[2],
-                one_output[3],
+            f.write("{0}\n".format(
+                ",".join([str(item) for item in one_output])
             ))
     print("saved train output to {}".format(save_output_path_train))
 
@@ -332,6 +329,7 @@ if __name__ == "__main__":
     parser.add_argument("--filter", type=str, default="all", help="filter")
     parser.add_argument("--epoch", type=int, default=1000, help="epoch")
     parser.add_argument("--gpu_id", type=int, default=0, help="gpu_id")
+    parser.add_argument("--input_n", type=int, default=3, help="input_n")
     opt = parser.parse_args()
 
     opt_print = opt.__dict__.copy()

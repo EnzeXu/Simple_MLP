@@ -228,6 +228,15 @@ def one_time_filter_data(data_path, filter_list):
     with open(data_path, "r") as f:
         lines = f.readlines()
     lines = [line for line in lines if len(line) > 10 and "k_" not in line]
+
+    n_col = len(lines[0].split(","))
+    assert n_col in [6, 7]
+    if n_col == 7:
+        y_start_col = 3
+    else:
+        y_start_col = 2
+    print(f"# n_col = {n_col}, so y_start_col = {y_start_col}")
+
     print(f"Initial: all {len(lines)} lines")
 
     for one_filter in filter_list:
@@ -244,7 +253,7 @@ def one_time_filter_data(data_path, filter_list):
         print(f"# filter: <{one_filter} or inf")
         for one_line in lines:
             parts = one_line.split(",")
-            c1, c2, c3 = parts[3], parts[4], parts[5]
+            c1, c2, c3 = parts[y_start_col], parts[y_start_col + 1], parts[y_start_col + 2]
             if c1 == c2 == c3 == "inf":
                 count_inf += 1
                 f_write.write(one_line)
@@ -369,9 +378,14 @@ if __name__ == "__main__":
     # a = np.asarray(a)
     # np.random.shuffle(a)
     # print(a)
-    one_time_filter_data("data/dataset_osci_3_4_5_v0604.csv", [999999, 200, 100])
+    # one_time_filter_data("data/dataset_osci_3_4_5_v0604.csv", [999999, 200, 100])
+    one_time_filter_data("data/dataset_osci_0_1_v0618.csv", [999999, 200, 100])
 
-    # for timestring in ["20230610_181925_338004", "20230610_181927_659788", "20230610_181931_660269"]:
+    # !output_20230612_000531_827740 *
+    # !output_20230612_000514_516716 *
+    # !output_20230612_000525_078931 *
+
+    # for timestring in ["20230612_000531_827740", "20230612_000514_516716", "20230612_000525_078931"]:
     #     # one_time_draw_3d_points_from_txt(f"record/output/output_{timestring}_last_train.txt",
     #     #                                  f"test/comparison_{timestring}_last_train.png",
     #     #                                  title="Results of the Train Set (n={}) [dataset=k_hyz_k_pyx_k_smzx]", log_flag=False)

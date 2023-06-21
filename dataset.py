@@ -21,19 +21,37 @@ class MyDataset(Dataset):
         print(f"loading data from {path} ...")
         df = pd.read_csv(path, header=None)
 
-        self.x_data = torch.tensor(df.values, dtype=torch.float64)[:, :3]
-        self.y_data = torch.tensor(df.values, dtype=torch.float64)[:, 3:4]
-        self.x_data[:, 0:1], x1_min, x1_max = my_min_max(self.x_data[:, 0:1])
-        self.x_data[:, 1:2], x2_min, x2_max = my_min_max(self.x_data[:, 1:2])
-        self.x_data[:, 2:3], x3_min, x3_max = my_min_max(self.x_data[:, 2:3])
-        self.y_data, y_min, y_max = my_min_max(self.y_data)
+        n_col = df.values.shape[-1]
+        assert n_col in [6, 7]
+
         record = dict()
-        record["x1_min"] = x1_min
-        record["x1_max"] = x1_max
-        record["x2_min"] = x2_min
-        record["x2_max"] = x2_max
-        record["x3_min"] = x3_min
-        record["x3_max"] = x3_max
+
+        if n_col == 7:  # for 3->1
+            self.x_data = torch.tensor(df.values, dtype=torch.float64)[:, :3]
+            self.y_data = torch.tensor(df.values, dtype=torch.float64)[:, 3:4]
+            self.x_data[:, 0:1], x1_min, x1_max = my_min_max(self.x_data[:, 0:1])
+            self.x_data[:, 1:2], x2_min, x2_max = my_min_max(self.x_data[:, 1:2])
+            self.x_data[:, 2:3], x3_min, x3_max = my_min_max(self.x_data[:, 2:3])
+            record["x1_min"] = x1_min
+            record["x1_max"] = x1_max
+            record["x2_min"] = x2_min
+            record["x2_max"] = x2_max
+            record["x3_min"] = x3_min
+            record["x3_max"] = x3_max
+        else:  # for 2->1
+            self.x_data = torch.tensor(df.values, dtype=torch.float64)[:, :2]
+            self.y_data = torch.tensor(df.values, dtype=torch.float64)[:, 2:3]
+            self.x_data[:, 0:1], x1_min, x1_max = my_min_max(self.x_data[:, 0:1])
+            self.x_data[:, 1:2], x2_min, x2_max = my_min_max(self.x_data[:, 1:2])
+            record["x1_min"] = x1_min
+            record["x1_max"] = x1_max
+            record["x2_min"] = x2_min
+            record["x2_max"] = x2_max
+
+        print(f"In generating dataset, n_col = {n_col}, and keys of record: {list(record.keys())}")
+
+        self.y_data, y_min, y_max = my_min_max(self.y_data)
+
         record["y_min"] = y_min
         record["y_max"] = y_max
         with open(f"processed/filter={filter}/record_min_max.pkl", "wb") as f:
@@ -122,6 +140,10 @@ if __name__ == "__main__":
     # one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "200")
     # one_time_generate_dataset("data/dataset_osci_0_1_2_v0604.csv", "100")
 
-    one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "all")
-    one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "200")
-    one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "100")
+    # one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "all")
+    # one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "200")
+    # one_time_generate_dataset("data/dataset_osci_3_4_5_v0604.csv", "100")
+
+    one_time_generate_dataset("data/dataset_0_1_v0618.csv", "all")
+    one_time_generate_dataset("data/dataset_0_1_v0618.csv", "200")
+    one_time_generate_dataset("data/dataset_0_1_v0618.csv", "100")
