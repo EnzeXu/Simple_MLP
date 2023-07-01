@@ -247,7 +247,7 @@ def generate_output(pt_path, opt, timestring=None, device=None, pt_type="test"):
     x1_max = record["x1_max"]
     x2_min = record["x2_min"]
     x2_max = record["x2_max"]
-    assert opt.input_n in [2, 3]
+    assert opt.input_n in [2, 3, 7]
 
     y_min = record["y_min"]
     y_max = record["y_max"]
@@ -257,6 +257,22 @@ def generate_output(pt_path, opt, timestring=None, device=None, pt_type="test"):
         x3_min = record["x3_min"]
         x3_max = record["x3_max"]
         x_data_raw[:, 2:3] = decode(x_data_raw[:, 2:3], x3_min, x3_max)
+    elif opt.input_n == 7:
+        x3_min = record["x3_min"]
+        x3_max = record["x3_max"]
+        x4_min = record["x4_min"]
+        x4_max = record["x4_max"]
+        x5_min = record["x5_min"]
+        x5_max = record["x5_max"]
+        x6_min = record["x6_min"]
+        x6_max = record["x6_max"]
+        x7_min = record["x7_min"]
+        x7_max = record["x7_max"]
+        x_data_raw[:, 2:3] = decode(x_data_raw[:, 2:3], x3_min, x3_max)
+        x_data_raw[:, 3:4] = decode(x_data_raw[:, 3:4], x4_min, x4_max)
+        x_data_raw[:, 4:5] = decode(x_data_raw[:, 4:5], x5_min, x5_max)
+        x_data_raw[:, 5:6] = decode(x_data_raw[:, 5:6], x6_min, x6_max)
+        x_data_raw[:, 6:7] = decode(x_data_raw[:, 6:7], x7_min, x7_max)
     y_data_raw[:, :] = decode(y_data_raw[:, :], y_min, y_max)
 
     with open(save_output_path_val, "w") as f:
