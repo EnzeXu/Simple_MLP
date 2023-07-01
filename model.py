@@ -185,6 +185,7 @@ def run(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs
                     ))
     print("saved comparison to {}".format(save_comparison_path))
 
+
 def relative_loss(prediction, target):
     criterion = nn.MSELoss(reduction="none")
     mse_non_reduce = criterion(prediction, target)
