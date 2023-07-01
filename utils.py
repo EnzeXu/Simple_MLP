@@ -538,7 +538,9 @@ if __name__ == "__main__":
     # print(a)
     # one_time_filter_data("data/dataset_osci_3_4_5_v0604.csv", [999999, 200, 100])
     # one_time_filter_data("data/dataset_osci_0_1_v0618.csv", [999999, 200, 100])
-    one_time_filter_data("data/dataset_osci_v0628_large.csv", [999999, 200, 100])
+    # one_time_filter_data("data/dataset_osci_v0628_large.csv", [999999, 200, 100])
+
+    one_time_filter_data("data/dataset_osci_v0628_small.csv", [999999, 200, 100])
 
     # !output_20230612_000531_827740 *
     # !output_20230612_000514_516716 *

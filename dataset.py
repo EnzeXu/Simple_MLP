@@ -175,6 +175,10 @@ if __name__ == "__main__":
     # one_time_generate_dataset("data/dataset_osci_0_1_v0618.csv", "200")
     # one_time_generate_dataset("data/dataset_osci_0_1_v0618.csv", "100")
 
-    one_time_generate_dataset("data/dataset_osci_v0628_large.csv", "all")
-    one_time_generate_dataset("data/dataset_osci_v0628_large.csv", "200")
-    one_time_generate_dataset("data/dataset_osci_v0628_large.csv", "100")
+    # one_time_generate_dataset("data/dataset_osci_v0628_large.csv", "all")
+    # one_time_generate_dataset("data/dataset_osci_v0628_large.csv", "200")
+    # one_time_generate_dataset("data/dataset_osci_v0628_large.csv", "100")
+
+    one_time_generate_dataset("data/dataset_osci_v0628_small.csv", "all")
+    one_time_generate_dataset("data/dataset_osci_v0628_small.csv", "200")
+    one_time_generate_dataset("data/dataset_osci_v0628_small.csv", "100")
